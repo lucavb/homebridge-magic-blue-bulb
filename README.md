@@ -1,6 +1,6 @@
 
 
-# Homebridge MagicBlue LED Light Bulb Plugin
+# Homebridge MagicBlue LED Light Bulb Plug in
 
 This plug-in enables you to control your MagicBlue LED light bulb.
 
@@ -37,9 +37,13 @@ This project is currently not submitted to npmjs so you will need to manually do
 
 | Key           | Description                                                                        |
 |---------------|------------------------------------------------------------------------------------|
-| accessory     | Required. Has to be "ws2801-led-strip"                                             |
-| name          | Required. The name of this accessory. This will appear in your homekit app         |
+| accessory     | Required. Has to be "magic-blue-bulb"                                             |
+| name          | Required. The name of this accessory. This will appear in your Homekit app         |
 | mac           | Required. The mac address that you discovered earlier                              |
 
 ## Issues
-I have not tested this plugin in any shape or form. It works great for me but I did not test any other systems or anything. Feel free to use it and make suggestions in case of bugs. I do not take responsibility for any issues or damages this code might cause for you. Use at your own risk.
+I have not tested this plug in in any shape or form. It works great for me but I did not test any other systems or anything. Feel free to use it and make suggestions in case of bugs. I do not take responsibility for any issues or damages this code might cause for you. Use at your own risk.
+
+## Credit
+
+I used the codes that were discovered by the author of this [post](https://bene.tweakblogs.net/blog/12447/connect-a-bluetooth-lightbulb-to-philips-hue). His findings were also used in his [repository](https://github.com/b0tting/magicbluehue). If the author reads this, I did not find your name on your blog. You can send me a message and I'll gladly add your name.
