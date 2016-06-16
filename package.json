@@ -1,0 +1,33 @@
+{
+  "name": "homebridge-magic-blue-bulb",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for the MagicBlue LED Lightbulbs",
+  "main": "index.js",
+  "dependencies": {
+    "noble": "^1.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lucavb/homebridge-magic-blue-bulb.git"
+  },
+  "keywords": [
+    "homebridge-plugin"
+  ],
+  "author": "Luca Becker",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lucavb/homebridge-magic-blue-bulb/issues"
+  },
+  "homepage": "https://github.com/lucavb/homebridge-magic-blue-bulb#readme",
+  "engines" : {
+      "node": ">=0.12.0",
+      "homebridge": ">=0.2.0"
+  },
+  "dependencies" :{ 
+    "noble" : "1.6.0"
+  }
+}
