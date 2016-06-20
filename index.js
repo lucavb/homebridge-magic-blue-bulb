@@ -25,7 +25,7 @@ function MagicBlueBulb(log, config) {
     };
     this.mac = config.mac.toLowerCase();
 
-    this.connectBulb(this.mac);
+    this.findBulb(this.mac);
     
 
 
@@ -63,7 +63,7 @@ function MagicBlueBulb(log, config) {
         .on('set', this.setBright.bind(this));
 }
 
-MagicBlueBulb.prototype.connectBulb = function(mac, callback) {
+MagicBlueBulb.prototype.findBulb = function(mac, callback) {
     var that = this;
     noble.on('stateChange', function(state) {
         if (state === 'poweredOn') {
@@ -76,17 +76,10 @@ MagicBlueBulb.prototype.connectBulb = function(mac, callback) {
     noble.on('discover', function(peripheral) {
         if (peripheral.id === mac || peripheral.address === mac) {
             noble.stopScanning();
-            peripheral.connect(function(error) {
-                if (!error) {
-                    that.peripheral = peripheral;
-                } else {
-                    console.log(error);
-                }
-                if (callback) callback();
-                peripheral.on('disconnect', function() {
-                    that.peripheral = null;
-                });
-            });
+            that.peripheral = peripheral;
+            // peripheral.on('disconnect', function() {
+            //     console.log("got disconnected");
+            // });
         }
     });
 };
@@ -99,26 +92,35 @@ MagicBlueBulb.prototype.writeColor = function(callback) {
             if (error) console.log('BLE: Write handle Error: ' + error);
             callback();
         });
-    }
-    if (this.peripheral) {
-        temp();
-    } else {
-        connectBulb(this.mac, temp);
+    };
+    this.attemptConnect(temp);
+};
+
+MagicBlueBulb.prototype.attemptConnect = function(callback){
+    if (this.peripheral && this.peripheral.state == "connected") {
+        callback();
+    } else if (this.peripheral && this.peripheral.state == "disconnected") {
+        this.peripheral.connect(function(error) {
+            if (!error) callback();
+        });
     }
 }
 
 MagicBlueBulb.prototype.setState = function(status, callback) {
+    var code = 0x24, that = this;
     if (status) {
-        this.peripheral.writeHandle(0x000c, new Buffer([0xcc, 0x23, 0x33]), true, function (error) {
+        code = 0x23;
+    } 
+    var temp = function() {
+        if (!that.peripheral) {
+            callback(new Error());
+        }
+        that.peripheral.writeHandle(0x000c, new Buffer([0xcc, code, 0x33]), true, function (error) {
             if (error) console.log('BLE: Write handle Error: ' + error);
             callback();
         });
-    } else {
-        this.peripheral.writeHandle(0x000c, new Buffer([0xcc, 0x24, 0x33]), true, function (error) {
-            if (error) console.log('BLE: Write handle Error: ' + error);
-            callback();
-        });
-    }
+    };
+    this.attemptConnect(temp);
     this.ledsStatus.on = status;
 };
 

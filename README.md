@@ -47,3 +47,5 @@ I have not tested this plug in in any shape or form. It works great for me but I
 ## Credit
 
 I used the codes that were discovered by the author of this [post](https://bene.tweakblogs.net/blog/12447/connect-a-bluetooth-lightbulb-to-philips-hue). His findings were also used in his [repository](https://github.com/b0tting/magicbluehue). If the author reads this, I did not find your name on your blog. You can send me a message and I'll gladly add your name.
+
+And another thanks to Garry Tan for the conversion methods. See his post [here](http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c).
