@@ -24,6 +24,7 @@ function MagicBlueBulb(log, config) {
         "values" : rgbConversion.rgbToHsl(255, 255, 255)
     };
     this.mac = config.mac.toLowerCase();
+    this.handle = config.handle || 0x000c;
 
     this.findBulb(this.mac);
     
@@ -75,7 +76,8 @@ MagicBlueBulb.prototype.findBulb = function(mac, callback) {
 
     noble.on('discover', function(peripheral) {
         if (peripheral.id === mac || peripheral.address === mac) {
-            noble.stopScanning();
+            that.log("found my bulb");
+            //noble.stopScanning();
             that.peripheral = peripheral;
             // peripheral.on('disconnect', function() {
             //     console.log("got disconnected");
@@ -88,7 +90,7 @@ MagicBlueBulb.prototype.writeColor = function(callback) {
     var that = this;
     var temp = function() {
         var rgb = rgbConversion.hslToRgb(that.ledsStatus.values[0], that.ledsStatus.values[1], that.ledsStatus.values[2]);
-        that.peripheral.writeHandle(0x000c, new Buffer([0x56, rgb.r, rgb.g, rgb.b, 0x00, 0xf0, 0xaa, 0x3b, 0x07, 0x00, 0x01]), true, function (error) {
+        that.peripheral.writeHandle(that.handle, new Buffer([0x56, rgb.r, rgb.g, rgb.b, 0x00, 0xf0, 0xaa, 0x3b, 0x07, 0x00, 0x01]), true, function (error) {
             if (error) console.log('BLE: Write handle Error: ' + error);
             callback();
         });
@@ -115,7 +117,7 @@ MagicBlueBulb.prototype.setState = function(status, callback) {
         if (!that.peripheral) {
             callback(new Error());
         }
-        that.peripheral.writeHandle(0x000c, new Buffer([0xcc, code, 0x33]), true, function (error) {
+        that.peripheral.writeHandle(that.handle, new Buffer([0xcc, code, 0x33]), true, function (error) {
             if (error) console.log('BLE: Write handle Error: ' + error);
             callback();
         });
