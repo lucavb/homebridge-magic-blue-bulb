@@ -23,7 +23,9 @@ The light bulb uses Bluetooth low energy. This means that your Raspberry Pi need
 
 ## Installation
 
-This project is currently not submitted to npmjs so you will need to manually download this plug-in put it somewhere on your Raspberry Pi, download the dependencies and alter the command you run for homebridge to find this plug-in. How this is done can be seen on this [page](https://github.com/nfarina/homebridge).
+This project is currently not submitted to npmjs so you will need to manually download this plug-in put it somewhere on your Raspberry Pi, download the dependencies and alter the command you run for homebridge to find this plug-in. I explained how this is done over at another project of mine [here](https://github.com/lucavb/homebridge-hc-sr501). A more general approach can be seen from the [hombridge github page](https://github.com/nfarina/homebridge).
+
+
 
 ## Config.json file
 
