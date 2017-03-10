@@ -24,7 +24,7 @@ function MagicBlueBulb(log, config) {
         "values" : rgbConversion.rgbToHsl(255, 255, 255)
     };
     this.mac = config.mac.toLowerCase();
-    this.handle = config.handle || 0x000c;
+    this.handle = config.handle || 0x000c; // v9 is 0x000b
 
     this.findBulb(this.mac);
     
@@ -88,7 +88,11 @@ MagicBlueBulb.prototype.findBulb = function(mac, callback) {
 
 MagicBlueBulb.prototype.writeColor = function(callback) {
     var that = this;
-    var temp = function() {
+    var temp = function(res) {
+        if (!res) {
+            //callback(new Error());
+            return;
+        }
         var rgb = rgbConversion.hslToRgb(that.ledsStatus.values[0], that.ledsStatus.values[1], that.ledsStatus.values[2]);
         that.peripheral.writeHandle(that.handle, new Buffer([0x56, rgb.r, rgb.g, rgb.b, 0x00, 0xf0, 0xaa, 0x3b, 0x07, 0x00, 0x01]), true, function (error) {
             if (error) console.log('BLE: Write handle Error: ' + error);
@@ -100,10 +104,18 @@ MagicBlueBulb.prototype.writeColor = function(callback) {
 
 MagicBlueBulb.prototype.attemptConnect = function(callback){
     if (this.peripheral && this.peripheral.state == "connected") {
-        callback();
+        callback(true);
     } else if (this.peripheral && this.peripheral.state == "disconnected") {
+        this.log("lost connection to bulb. attempting reconnect ...");
+        var that = this;
         this.peripheral.connect(function(error) {
-            if (!error) callback();
+            if (!error) {
+                that.log("reconnect was successful");
+                callback(true);
+            } else {
+                that.log("reconnect was unsuccessful");
+                callback(false);
+            }
         });
     }
 }
@@ -113,12 +125,13 @@ MagicBlueBulb.prototype.setState = function(status, callback) {
     if (status) {
         code = 0x23;
     } 
-    var temp = function() {
-        if (!that.peripheral) {
+    var temp = function(res) {
+        if (!that.peripheral || !res) {
             callback(new Error());
+            return;
         }
         that.peripheral.writeHandle(that.handle, new Buffer([0xcc, code, 0x33]), true, function (error) {
-            if (error) console.log('BLE: Write handle Error: ' + error);
+            if (error) that.log('BLE: Write handle Error: ' + error);
             callback();
         });
     };

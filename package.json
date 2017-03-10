@@ -28,6 +28,6 @@
       "homebridge": ">=0.2.0"
   },
   "dependencies" :{ 
-    "noble" : "1.6.0"
+    "noble" : "1.8.0"
   }
 }
