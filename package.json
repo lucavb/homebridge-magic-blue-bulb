@@ -18,7 +18,7 @@
     "homebridge-plugin"
   ],
   "author": "Luca Becker",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/lucavb/homebridge-magic-blue-bulb/issues"
   },
