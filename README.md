@@ -23,7 +23,12 @@ The light bulb uses Bluetooth low energy. This means that your Raspberry Pi need
 
 ## Installation
 
-This project is currently not submitted to npmjs so you will need to manually download this plug-in put it somewhere on your Raspberry Pi, download the dependencies and alter the command you run for homebridge to find this plug-in. I explained how this is done over at another project of mine [here](https://github.com/lucavb/homebridge-hc-sr501). A more general approach can be seen from the [hombridge github page](https://github.com/nfarina/homebridge).
+Run the following command
+```
+npm install -g homebridge-magic-blue-bulb
+```
+
+Chances are you are going to need sudo with that.
 
 
 
@@ -43,10 +48,11 @@ This project is currently not submitted to npmjs so you will need to manually do
 | accessory     | Required. Has to be "magic-blue-bulb"                                             |
 | name          | Required. The name of this accessory. This will appear in your Homekit app         |
 | mac           | Required. The mac address that you discovered earlier                              |
-| handle           | Optional. The handle that is used by the bulb for setting on/off and colors. This basically works like a key and you are writing the value. Use 46 for the newer(?) version of the bulbs. The standard value for the older(?) version is integrated into the code                                |
+| handle        | Optional. The handle that is used by the bulb for setting on/off and colors. This basically works like a key and you are writing the value. Use 46 for the newer(?) version of the bulbs. The standard value for the older(?) version is integrated into the code |
 
 ## Issues
-I have not tested this plug in in any shape or form. It works great for me but I did not test any other systems or anything. Feel free to use it and make suggestions in case of bugs. I do not take responsibility for any issues or damages this code might cause for you. Use at your own risk.
+
+This software comes with no warranty. It works for me and it might for you.
 
 ## Credit
 
