@@ -10,7 +10,6 @@ module.exports = function(homebridge) {
     Characteristic = homebridge.hap.Characteristic;
     HomebridgeAPI = homebridge;
 
-    // console.log(Service.ContactSensor);
     homebridge.registerAccessory("homebridge-magic-blue-bulb", "magic-blue-bulb", MagicBlueBulb);
 };
 
@@ -77,11 +76,7 @@ MagicBlueBulb.prototype.findBulb = function(mac, callback) {
     noble.on('discover', function(peripheral) {
         if (peripheral.id === mac || peripheral.address === mac) {
             that.log("found my bulb");
-            //noble.stopScanning();
             that.peripheral = peripheral;
-            // peripheral.on('disconnect', function() {
-            //     console.log("got disconnected");
-            // });
         }
     });
 };
