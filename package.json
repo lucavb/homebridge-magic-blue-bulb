@@ -9,6 +9,9 @@
     ],
     "scripts": {
         "build": "tsc --project tsconfig.app.json",
+        "lint": "eslint --config .eslintrc.json ./**/*.ts",
+        "format": "prettier -w ./**/*.{md,json,ts,js}",
+        "prepack": "npm run build",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
