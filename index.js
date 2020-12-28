@@ -13,7 +13,6 @@ module.exports = function (homebridge) {
 };
 
 function MagicBlueBulb(log, config) {
-    var that = this;
     this.log = log;
     this.name = config.name;
     this.ledsStatus = {
