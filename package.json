@@ -1,6 +1,6 @@
 {
     "name": "homebridge-magic-blue-bulb",
-    "version": "1.0.2",
+    "version": "2.0.0",
     "description": "Homebridge plugin for the MagicBlue LED Lightbulbs",
     "main": "dist/index.js",
     "types": "dist/index.d.ts",
