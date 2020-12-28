@@ -3,6 +3,10 @@
     "version": "1.0.2",
     "description": "Homebridge plugin for the MagicBlue LED Lightbulbs",
     "main": "index.js",
+    "files": [
+        "index.js",
+        "rgbConversion.js"
+    ],
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
