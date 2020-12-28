@@ -1,5 +1,3 @@
-
-
 # Homebridge MagicBlue LED Light Bulb Plug in
 
 This plug-in enables you to control your MagicBlue LED light bulb.
@@ -24,31 +22,30 @@ The light bulb uses Bluetooth low energy. This means that your Raspberry Pi need
 ## Installation
 
 Run the following command
+
 ```
 npm install -g homebridge-magic-blue-bulb
 ```
 
 Chances are you are going to need sudo with that.
 
-
-
 ## Config.json file
 
 ```json
-	{
-	    "accessory" : "magic-blue-bulb",
-	    "name" : "MagicBlue",
-	    "mac" : "FB:00:E0:82:AA:1F",
-	    "handle" : 46
-	}
+{
+    "accessory": "magic-blue-bulb",
+    "name": "MagicBlue",
+    "mac": "FB:00:E0:82:AA:1F",
+    "handle": 46
+}
 ```
 
-| Key           | Description                                                                        |
-|---------------|------------------------------------------------------------------------------------|
-| accessory     | Required. Has to be "magic-blue-bulb"                                             |
-| name          | Required. The name of this accessory. This will appear in your Homekit app         |
-| mac           | Required. The mac address that you discovered earlier                              |
-| handle        | Optional. The handle that is used by the bulb for setting on/off and colors. This basically works like a key and you are writing the value. Use 46 for the newer(?) version of the bulbs. The standard value for the older(?) version is integrated into the code |
+| Key       | Description                                                                                                                                                                                                                                                       |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| accessory | Required. Has to be "magic-blue-bulb"                                                                                                                                                                                                                             |
+| name      | Required. The name of this accessory. This will appear in your Homekit app                                                                                                                                                                                        |
+| mac       | Required. The mac address that you discovered earlier                                                                                                                                                                                                             |
+| handle    | Optional. The handle that is used by the bulb for setting on/off and colors. This basically works like a key and you are writing the value. Use 46 for the newer(?) version of the bulbs. The standard value for the older(?) version is integrated into the code |
 
 ## Issues
 
