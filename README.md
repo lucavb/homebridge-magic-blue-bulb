@@ -2,12 +2,31 @@
 
 This plug-in enables you to control your MagicBlue LED light bulb.
 
+## New Version
+
+Releases that start with version 1.x.x are based on the old code base. If you want to support this
+project feel free to install version 2.x.x by running this command:
+
+```shell
+npm install -g homebridge-magic-blue-bulb@alpha
+```
+
+This software is still in the alpha phase. Should you find any issues, please open up an
+[issue](https://github.com/lucavb/homebridge-magic-blue-bulb/issues/new) on
+GitHub. Nevertheless, this new version should work as a drop-in replacement for the old version, so
+your configuration does not require an update.
+
 ## Connecting and setting up
 
-The light bulb uses Bluetooth low energy. This means that your Raspberry Pi needs to have Bluetooth in some way. You will need to know the mac address of the light bulb. You can discover it by installing bluez and everything to your Raspberry Pi. A possible guide can be found [here](http://www.elinux.org/RPi_Bluetooth_LE). However you don't need to compile it yourself. I find the version in the repositories to be sufficient. You can then discover the mac address by running the command shown below. The mac is "FB:00:E0:82:AA:1F" in this case.
+The light bulb uses Bluetooth low energy. This means that your Raspberry Pi needs to have Bluetooth
+in some way. You will need to know the mac address of the light bulb. You can discover it by
+installing bluez and everything to your Raspberry Pi. A possible guide can be found
+[here](http://www.elinux.org/RPi_Bluetooth_LE). However, you don't need to compile it yourself.
+I find the version in the repositories to be sufficient. You can then discover the mac address
+by running the command shown below. The mac is "FB:00:E0:82:AA:1F" in this case.
 
-```
-	pi@raspberrypi:/var/homebridge/own_plugins/homebridge-magic-blue-bulb$ sudo hcitool lescan
+```shell
+	$ sudo hcitool lescan
 	LE Scan ...
 	FF:FF:C8:5D:68:9E Eve
 	FF:FF:C8:5D:68:9E Eve Thermo
@@ -23,7 +42,7 @@ The light bulb uses Bluetooth low energy. This means that your Raspberry Pi need
 
 Run the following command
 
-```
+```shell
 npm install -g homebridge-magic-blue-bulb
 ```
 
@@ -55,4 +74,4 @@ This software comes with no warranty. It works for me and it might for you.
 
 I used the codes that were discovered by the author of this [post](https://bene.tweakblogs.net/blog/12447/connect-a-bluetooth-lightbulb-to-philips-hue). His findings were also used in his [repository](https://github.com/b0tting/magicbluehue). If the author reads this, I did not find your name on your blog. You can send me a message and I'll gladly add your name.
 
-And another thanks to Garry Tan for the conversion methods. See his post [here](http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c).
+Another thanks to Garry Tan for the conversion methods. See his post [here](http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c).
