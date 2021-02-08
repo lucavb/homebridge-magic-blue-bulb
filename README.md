@@ -8,7 +8,7 @@ Releases that start with version 1.x.x are based on the old code base. If you wa
 project feel free to install version 2.x.x by running this command:
 
 ```shell
-npm install -g homebridge-magic-blue-bulb@alpha
+not sure ---- //*npm install -g homebridge-magic-blue-bulb@alpha
 ```
 
 This software is still in the alpha phase. Should you find any issues, please open up an
