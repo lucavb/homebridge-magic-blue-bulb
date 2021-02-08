@@ -1,7 +1,7 @@
 var Service;
 var Characteristic;
 var HomebridgeAPI;
-var noble = require('noble');
+var noble = require('@abandonware/noble');
 var rgbConversion = require('./rgbConversion');
 
 module.exports = function (homebridge) {
@@ -20,7 +20,7 @@ function MagicBlueBulb(log, config) {
         values: rgbConversion.rgbToHsl(255, 255, 255),
     };
     this.mac = config.mac.toLowerCase();
-    this.handle = config.handle || 0x000c; // v9 is 0x000b
+    this.handle = config.handle || 0x0007; // v9 is 0x000b
 
     this.findBulb(this.mac);
 
@@ -79,7 +79,7 @@ MagicBlueBulb.prototype.writeColor = function (callback) {
         );
         that.peripheral.writeHandle(
             that.handle,
-            new Buffer([0x56, rgb.r, rgb.g, rgb.b, 0x00, 0xf0, 0xaa, 0x3b, 0x07, 0x00, 0x01]),
+            new Buffer([0x56, rgb.r, rgb.g, rgb.b, 0x00, 0xf0, 0xaa]),
             true,
             function (error) {
                 if (error) console.log('BLE: Write handle Error: ' + error);
