@@ -28,7 +28,7 @@
         "homebridge": ">=0.2.0"
     },
     "dependencies": {
-        "noble": "1.8.0"
+       "@abandonware/noble": "^1.9.2-5"
     },
     "devDependencies": {
         "prettier": "2.2.1"
