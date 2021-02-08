@@ -1,4 +1,4 @@
-# Homebridge Triones LED Light Bulb Plug in
+# Homebridge Triones LED Light Fluter Plug in
 
 This plug-in enables you to control your MagicBlue LED light bulb.
 
