@@ -9,7 +9,7 @@ not sure ---- //*npm install -g homebridge-magic-blue-bulb@alpha
 ```
 
 This software is still in the alpha phase. Should you find any issues, please open up an
-[issue](https://github.com/lucavb/homebridge-magic-blue-bulb/issues/new) on
+[issue](https://github.com/v0r73x/homebridge-magic-triones/issues/new) on
 GitHub. Nevertheless, this new version should work as a drop-in replacement for the old version, so
 your configuration does not require an update.
 
