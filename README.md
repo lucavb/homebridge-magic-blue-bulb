@@ -40,7 +40,7 @@ by running the command shown below. The mac is "FB:00:E0:82:AA:1F" in this case.
 Run the following command
 
 ```shell
-npm install -g homebridge-magic-blue-bulb
+npm install -g homebridge-magic-triones
 ```
 
 Chances are you are going to need sudo with that.
@@ -49,8 +49,8 @@ Chances are you are going to need sudo with that.
 
 ```json
 {
-    "accessory": "magic-blue-bulb",
-    "name": "MagicBlue",
+    "accessory": "homebridge-magic-triones",
+    "name": "Fluter A",
     "mac": "FB:00:E0:82:AA:1F",
     "handle": 46
 }
