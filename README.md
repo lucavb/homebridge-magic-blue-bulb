@@ -52,7 +52,6 @@ Chances are you are going to need sudo with that.
     "accessory": "homebridge-magic-triones",
     "name": "Fluter A",
     "mac": "FB:00:E0:82:AA:1F",
-    "handle": 46
 }
 ```
 
