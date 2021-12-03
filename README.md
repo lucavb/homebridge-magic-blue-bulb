@@ -5,7 +5,7 @@ This plug-in enables you to control your Happy Lightning LED light bulb.
 ## New Version
 
 ```shell
-not sure ---- //*npm install -g homebridge-magic-blue-bulb@alpha
+not sure ---- //*npm install -g homebridge-magic-triones
 ```
 
 This software is still in the alpha phase. Should you find any issues, please open up an
@@ -58,7 +58,7 @@ Chances are you are going to need sudo with that.
 
 | Key       | Description                                                                                                                                                                                                                                                       |
 | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| accessory | Required. Has to be "magic-blue-bulb"                                                                                                                                                                                                                             |
+| accessory | Required. Has to be "homebridge-magic-triones"                                                                                                                                                                                                                             |
 | name      | Required. The name of this accessory. This will appear in your Homekit app                                                                                                                                                                                        |
 | mac       | Required. The mac address that you discovered earlier                                                                                                                                                                                                             |
 | handle    | Optional. The handle that is used by the bulb for setting on/off and colors. This basically works like a key and you are writing the value. Use 46 for the newer(?) version of the bulbs. The standard value for the older(?) version is integrated into the code |
