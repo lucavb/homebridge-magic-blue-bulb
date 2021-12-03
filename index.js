@@ -9,10 +9,10 @@ module.exports = function (homebridge) {
     Characteristic = homebridge.hap.Characteristic;
     HomebridgeAPI = homebridge;
 
-    homebridge.registerAccessory('homebridge-magic-blue-bulb', 'magic-blue-bulb', MagicBlueBulb);
+    homebridge.registerAccessory('homebridge-magic-triones', 'magic-triones', MagicTriones);
 };
 
-function MagicBlueBulb(log, config) {
+function MagicTriones(log, config) {
     this.log = log;
     this.name = config.name;
     this.ledsStatus = {
@@ -29,7 +29,7 @@ function MagicBlueBulb(log, config) {
 
     this.informationService
         .setCharacteristic(Characteristic.Manufacturer, config.manufacturer || 'Light')
-        .setCharacteristic(Characteristic.Model, config.model || 'Magic Blue')
+        .setCharacteristic(Characteristic.Model, config.model || 'Magic Triones')
         .setCharacteristic(Characteristic.SerialNumber, config.serial || '5D4989E80E44');
 
     this.service = new Service.Lightbulb(this.name);
@@ -47,7 +47,7 @@ function MagicBlueBulb(log, config) {
     this.service.getCharacteristic(Characteristic.Brightness).on('set', this.setBright.bind(this));
 }
 
-MagicBlueBulb.prototype.findBulb = function (mac, callback) {
+MagicTriones.prototype.findBulb = function (mac, callback) {
     var that = this;
     noble.on('stateChange', function (state) {
         if (state === 'poweredOn') {
@@ -59,13 +59,13 @@ MagicBlueBulb.prototype.findBulb = function (mac, callback) {
 
     noble.on('discover', function (peripheral) {
         if (peripheral.id === mac || peripheral.address === mac) {
-            that.log('found my bulb');
+            that.log('found my Triones');
             that.peripheral = peripheral;
         }
     });
 };
 
-MagicBlueBulb.prototype.writeColor = function (callback) {
+MagicTriones.prototype.writeColor = function (callback) {
     var that = this;
     var temp = function (res) {
         if (!res) {
@@ -90,7 +90,7 @@ MagicBlueBulb.prototype.writeColor = function (callback) {
     this.attemptConnect(temp);
 };
 
-MagicBlueBulb.prototype.attemptConnect = function (callback) {
+MagicTriones.prototype.attemptConnect = function (callback) {
     if (this.peripheral && this.peripheral.state == 'connected') {
         callback(true);
     } else if (this.peripheral && this.peripheral.state == 'disconnected') {
@@ -108,7 +108,7 @@ MagicBlueBulb.prototype.attemptConnect = function (callback) {
     }
 };
 
-MagicBlueBulb.prototype.setState = function (status, callback) {
+MagicTriones.prototype.setState = function (status, callback) {
     var code = 0x24,
         that = this;
     if (status) {
@@ -128,15 +128,15 @@ MagicBlueBulb.prototype.setState = function (status, callback) {
     this.ledsStatus.on = status;
 };
 
-MagicBlueBulb.prototype.getState = function (callback) {
+MagicTriones.prototype.getState = function (callback) {
     callback(null, this.ledsStatus.on);
 };
 
-MagicBlueBulb.prototype.getHue = function (callback) {
+MagicTriones.prototype.getHue = function (callback) {
     callback(null, this.ledsStatus.values[0]);
 };
 
-MagicBlueBulb.prototype.setHue = function (level, callback) {
+MagicTriones.prototype.setHue = function (level, callback) {
     this.ledsStatus.values[0] = level;
     if (this.ledsStatus.on) {
         this.writeColor(function () {
@@ -147,11 +147,11 @@ MagicBlueBulb.prototype.setHue = function (level, callback) {
     }
 };
 
-MagicBlueBulb.prototype.getSat = function (callback) {
+MagicTriones.prototype.getSat = function (callback) {
     callback(null, this.ledsStatus.values[1]);
 };
 
-MagicBlueBulb.prototype.setSat = function (level, callback) {
+MagicTriones.prototype.setSat = function (level, callback) {
     this.ledsStatus.values[1] = level;
     if (this.ledsStatus.on) {
         this.writeColor(function () {
@@ -162,11 +162,11 @@ MagicBlueBulb.prototype.setSat = function (level, callback) {
     }
 };
 
-MagicBlueBulb.prototype.getBright = function (callback) {
+MagicTriones.prototype.getBright = function (callback) {
     callback(null, this.ledsStatus.values[2]);
 };
 
-MagicBlueBulb.prototype.setBright = function (level, callback) {
+MagicTriones.prototype.setBright = function (level, callback) {
     this.ledsStatus.values[2] = level;
     if (this.ledsStatus.on) {
         this.writeColor(function () {
@@ -177,6 +177,6 @@ MagicBlueBulb.prototype.setBright = function (level, callback) {
     }
 };
 
-MagicBlueBulb.prototype.getServices = function () {
+MagicTriones.prototype.getServices = function () {
     return [this.informationService, this.service];
 };
