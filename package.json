@@ -1,7 +1,7 @@
 {
-    "name": "homebridge-magic-blue-bulb",
-    "version": "1.0.3",
-    "description": "Homebridge plugin for the MagicBlue LED Lightbulbs",
+    "name": "homebridge-magic-triones",
+    "version": "1.0.0",
+    "description": "Homebridge plugin for the Triones Happylight BLE LED Fluters",
     "main": "index.js",
     "files": [
         "index.js",
@@ -12,17 +12,17 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/lucavb/homebridge-magic-blue-bulb.git"
+        "url": "git+https://github.com/v0r73x/homebridge-magic-triones.git"
     },
     "keywords": [
         "homebridge-plugin"
     ],
-    "author": "Luca Becker",
+    "author": "v0r73x",
     "license": "GPL-3.0",
     "bugs": {
-        "url": "https://github.com/lucavb/homebridge-magic-blue-bulb/issues"
+        "url": "https://github.com/v0r73x/homebridge-magic-triones/issues"
     },
-    "homepage": "https://github.com/lucavb/homebridge-magic-blue-bulb#readme",
+    "homepage": "https://github.com/v0r73x/homebridge-magic-triones#readme",
     "engines": {
         "node": ">=0.12.0",
         "homebridge": ">=0.2.0"
