@@ -4,9 +4,6 @@ This plug-in enables you to control your Happy Lightning LED light bulb.
 
 ## New Version
 
-Releases that start with version 1.x.x are based on the old code base. If you want to support this
-project feel free to install version 2.x.x by running this command:
-
 ```shell
 not sure ---- //*npm install -g homebridge-magic-blue-bulb@alpha
 ```
