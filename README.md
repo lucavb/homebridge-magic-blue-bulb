@@ -5,7 +5,7 @@ This plug-in enables you to control your Happy Lightning LED light bulb.
 ## New Version
 
 ```shell
-not sure ---- //*npm install -g homebridge-magic-triones
+npm install -g homebridge-magic-triones
 ```
 
 This software is still in the alpha phase. Should you find any issues, please open up an
