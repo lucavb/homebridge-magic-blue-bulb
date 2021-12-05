@@ -8,11 +8,6 @@ This plug-in enables you to control your Happy Lightning LED light bulb.
 npm install -g homebridge-magic-triones
 ```
 
-This software is still in the alpha phase. Should you find any issues, please open up an
-[issue](https://github.com/v0r73x/homebridge-magic-triones/issues/new) on
-GitHub. Nevertheless, this new version should work as a drop-in replacement for the old version, so
-your configuration does not require an update.
-
 ## Connecting and setting up
 
 The light bulb uses Bluetooth low energy. This means that your Raspberry Pi needs to have Bluetooth
