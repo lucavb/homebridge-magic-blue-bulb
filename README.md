@@ -1,6 +1,8 @@
 # Homebridge Triones LED Light Fluter Plug in
 
-This plug-in enables you to control your Happy Lightning LED light bulb.
+This plug-in enables you to control your Happy Lightning LED Fluter like in link below:
+
+https://www.amazon.de/APP-Steuerung-Flutlichtstrahler-Au%C3%9Fenstrahler-Wasserdicht-Stimmungslichter/dp/B07RH6L2MC/ref=asc_df_B07RH6L2MC/?tag=googshopde-21&linkCode=df0&hvadid=354526888989&hvpos=&hvnetw=g&hvrand=12516609704161754213&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043043&hvtargid=pla-792640354079&psc=1&th=1&psc=1&tag=&ref=&adgrpid=77086785812&hvpone=&hvptwo=&hvadid=354526888989&hvpos=&hvnetw=g&hvrand=12516609704161754213&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9043043&hvtargid=pla-792640354079
 
 ## New Version
 
