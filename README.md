@@ -28,7 +28,7 @@ by running the command shown below. The mac is "FB:00:E0:82:AA:1F" in this case.
 	33:03:44:44:AA:5C Eve Door
 	FB:00:E0:82:AA:1F (unknown)
 	22:20:7B:99:D3:AF (unknown)
-	FB:00:E0:82:AA:1F LEDBLE-A582661F    <--- this is your light bulb
+	FB:00:E0:82:AA:1F LEDBLE-A582661F    <--- this is your Fluter
 	22:20:7B:99:D3:AF (unknown)
 ```
 
