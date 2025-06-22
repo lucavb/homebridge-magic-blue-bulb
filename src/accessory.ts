@@ -117,7 +117,7 @@ export class MagicBlueBulbAccessory {
             return;
         }
 
-        const rgb: RgbColor = hslToRgb(
+        const rgb = hslToRgb(
             this.ledsStatus.values.hue,
             this.ledsStatus.values.saturation,
             this.ledsStatus.values.lightness,
