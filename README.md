@@ -23,7 +23,7 @@ Add this platform to your homebridge `config.json`:
             "bulbs": [
                 {
                     "name": "Living Room Light",
-                    "mac": "FB:00:E0:82:AA:1F",
+                    "mac": "aa:bb:cc:dd:ee:ff",
                     "handle": 12,
                     "manufacturer": "Magic Blue",
                     "model": "RGB Bulb",
@@ -31,7 +31,7 @@ Add this platform to your homebridge `config.json`:
                 },
                 {
                     "name": "Bedroom Light",
-                    "mac": "AA:BB:CC:DD:EE:FF",
+                    "mac": "ff:ee:dd:cc:bb:aa",
                     "handle": 12,
                     "manufacturer": "Magic Blue",
                     "model": "RGB Bulb",
@@ -91,7 +91,7 @@ If you're upgrading from v1.x, you'll need to update your configuration from an 
         {
             "accessory": "magic-blue-bulb",
             "name": "Magic Blue Bulb",
-            "mac": "FB:00:E0:82:AA:1F"
+            "mac": "aa:bb:cc:dd:ee:ff"
         }
     ]
 }
@@ -108,7 +108,7 @@ If you're upgrading from v1.x, you'll need to update your configuration from an 
             "bulbs": [
                 {
                     "name": "Magic Blue Bulb",
-                    "mac": "FB:00:E0:82:AA:1F"
+                    "mac": "aa:bb:cc:dd:ee:ff"
                 }
             ]
         }
@@ -143,9 +143,9 @@ FF:FF:C8:5D:68:9E Eve
 FF:FF:C8:5D:68:9E Eve Thermo
 33:03:44:44:AA:5C (unknown)
 33:03:44:44:AA:5C Eve Door
-FB:00:E0:82:AA:1F (unknown)
+aa:bb:cc:dd:ee:ff (unknown)
 22:20:7B:99:D3:AF (unknown)
-FB:00:E0:82:AA:1F LEDBLE-A582661F    <--- this is your light bulb
+aa:bb:cc:dd:ee:ff LEDBLE-A582661F    <--- this is your light bulb
 22:20:7B:99:D3:AF (unknown)
 ```
 
@@ -178,10 +178,12 @@ The TypeScript source files are in `src/` and the compiled JavaScript output is 
 ```
 homebridge-magic-blue-bulb/
 ├── src/
-│   ├── index.ts              # Main plugin file
-│   ├── rgbConversion.ts      # Color conversion utilities
-│   └── types/
-│       └── noble.d.ts        # Type definitions for Noble
+│   ├── index.ts              # Plugin registration and entry point
+│   ├── platform.ts           # Main platform class
+│   ├── accessory.ts          # Individual bulb accessory implementation
+│   ├── constants.ts          # BLE commands and default values
+│   ├── rgbConversion.ts      # HSL/RGB color conversion utilities
+│   └── types.ts              # TypeScript type definitions and validation
 ├── dist/                     # Compiled JavaScript output
 ├── tsconfig.json            # TypeScript configuration
 └── package.json             # Dependencies and scripts
@@ -189,9 +191,20 @@ homebridge-magic-blue-bulb/
 
 ## Requirements
 
-- Node.js >= 14.0.0
-- Homebridge >= 1.3.0
+- Node.js >= 22.0.0
+- Homebridge >= 1.6.0 (compatible with Homebridge v2.0)
 - Bluetooth LE support on your system
+
+## Homebridge v2.0 Compatibility
+
+This plugin is **fully compatible** with Homebridge v2.0! It uses:
+
+- ✅ Modern platform plugin architecture
+- ✅ Current HAP-NodeJS APIs (no deprecated patterns)
+- ✅ Proper TypeScript implementation with strict typing
+- ✅ Zod validation for enhanced configuration safety
+
+Users will see a green checkmark in the Homebridge UI once v2.0 is installed.
 
 ## Issues
 
