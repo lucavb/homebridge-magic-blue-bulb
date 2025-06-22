@@ -36,7 +36,11 @@
     "keywords": [
         "homebridge-plugin"
     ],
-    "author": "Luca Becker",
+    "author": {
+        "name": "Luca Becker",
+        "email": "hello@luca-becker.me",
+        "url": "https://luca-becker.me"
+    },
     "license": "GPL-3.0",
     "bugs": {
         "url": "https://github.com/lucavb/homebridge-magic-blue-bulb/issues"
