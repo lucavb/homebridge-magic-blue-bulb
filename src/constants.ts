@@ -1,18 +1,9 @@
-/**
- * Platform plugin constants
- */
 export const PLATFORM_NAME = 'MagicBlueBulbPlatform';
 export const PLUGIN_NAME = 'homebridge-magic-blue-bulb';
 
-/**
- * Magic Blue bulb protocol constants
- */
 export const DEFAULT_HANDLE = 0x000c; // v9 is 0x000b
 export const DEFAULT_HANDLE_V9 = 0x000b;
 
-/**
- * BLE command constants
- */
 export const BLE_COMMANDS = {
     TURN_ON: 0x23,
     TURN_OFF: 0x24,
@@ -22,9 +13,6 @@ export const BLE_COMMANDS = {
     POWER_COMMAND_SUFFIX: [0x33],
 } as const;
 
-/**
- * Default accessory information
- */
 export const DEFAULT_ACCESSORY_INFO = {
     MANUFACTURER: 'Light',
     MODEL: 'Magic Blue',

@@ -4,17 +4,12 @@ import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
 import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
 import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
 
-/**
- * Magic Blue Bulb Accessory
- *
- * This class represents a single Magic Blue LED bulb accessory.
- * It handles all the BLE communication and HomeKit characteristic management for one bulb.
- */
 export class MagicBlueBulbAccessory {
-    private service!: Service;
-    private ledsStatus: LedsStatus;
+    private readonly service: Service;
+    private readonly ledsStatus: LedsStatus;
     private readonly mac: string;
     private readonly handle: number;
+
     private peripheral?: Peripheral;
 
     constructor(
@@ -40,17 +35,13 @@ export class MagicBlueBulbAccessory {
         this.handle = bulb.handle || DEFAULT_HANDLE;
 
         this.setupAccessoryInformation(bulb);
-        this.setupLightbulbService(bulb);
+        this.service = this.setupLightbulbService(bulb);
 
-        // Initialize BLE discovery asynchronously
         this.findBulb(this.mac).catch((error) => {
             this.log.error(`Failed to initialize BLE discovery for ${bulb.name}:`, error);
         });
     }
 
-    /**
-     * Set up accessory information service
-     */
     private setupAccessoryInformation(bulb: BulbConfig): void {
         const accessoryInfo = this.accessory.getService(this.homebridgeService.AccessoryInformation);
         if (!accessoryInfo) {
@@ -70,54 +61,46 @@ export class MagicBlueBulbAccessory {
             );
     }
 
-    /**
-     * Set up lightbulb service and characteristic handlers
-     */
-    private setupLightbulbService(bulb: BulbConfig): void {
-        this.service =
+    private setupLightbulbService(bulb: BulbConfig) {
+        const service =
             this.accessory.getService(this.homebridgeService.Lightbulb) ||
             this.accessory.addService(this.homebridgeService.Lightbulb);
 
-        this.service.setCharacteristic(this.homebridgeCharacteristic.Name, bulb.name);
+        service.setCharacteristic(this.homebridgeCharacteristic.Name, bulb.name);
 
-        this.service
+        service
             .getCharacteristic(this.homebridgeCharacteristic.On)
             .onSet(this.setOn.bind(this))
             .onGet(this.getOn.bind(this));
 
-        this.service
+        service
             .getCharacteristic(this.homebridgeCharacteristic.Hue)
             .onSet(this.setHue.bind(this))
             .onGet(this.getHue.bind(this));
 
-        this.service
+        service
             .getCharacteristic(this.homebridgeCharacteristic.Saturation)
             .onSet(this.setSaturation.bind(this))
             .onGet(this.getSaturation.bind(this));
 
-        this.service
+        service
             .getCharacteristic(this.homebridgeCharacteristic.Brightness)
             .onSet(this.setBrightness.bind(this))
             .onGet(this.getBrightness.bind(this));
+        return service;
     }
 
-    /**
-     * Discover and connect to the Magic Blue bulb via Bluetooth LE
-     */
     private async findBulb(mac: string, callback?: () => void): Promise<void> {
         try {
-            // Wait for Bluetooth adapter to be powered on
             await noble.waitForPoweredOnAsync();
 
-            // Start scanning for devices
             await noble.startScanningAsync();
 
-            // Set up discovery handler
             noble.on('discover', (peripheral: Peripheral) => {
                 if (peripheral.id === mac || peripheral.address === mac) {
                     this.log.info('Found Magic Blue bulb:', mac);
                     this.peripheral = peripheral;
-                    noble.stopScanningAsync().catch(console.error); // Stop scanning once found
+                    noble.stopScanningAsync();
                     if (callback) {
                         callback();
                     }
@@ -128,9 +111,6 @@ export class MagicBlueBulbAccessory {
         }
     }
 
-    /**
-     * Write color data to the bulb via BLE
-     */
     private async writeColor(): Promise<void> {
         const connected = await this.attemptConnect();
         if (!connected) {
