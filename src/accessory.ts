@@ -2,7 +2,7 @@ import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
 import * as noble from 'noble';
 import { Peripheral } from 'noble';
 import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
-import { BulbConfig, LedsStatus } from './types';
+import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
 import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
 
 // Forward declaration to avoid circular import
@@ -31,7 +31,15 @@ export class MagicBlueBulbAccessory {
     private peripheral?: Peripheral;
 
     constructor(private readonly platform: MagicBlueBulbPlatform, private readonly accessory: PlatformAccessory) {
-        const bulb = this.accessory.context.bulb as BulbConfig;
+        // Validate bulb configuration from context
+        let bulb: BulbConfig;
+        try {
+            bulb = validateBulbConfig(this.accessory.context.bulb);
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.platform.log.error(`Invalid bulb configuration for ${this.accessory.displayName}: ${errorMessage}`);
+            throw error;
+        }
 
         this.ledsStatus = {
             on: true,

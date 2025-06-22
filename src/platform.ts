@@ -8,7 +8,7 @@ import {
     Characteristic,
 } from 'homebridge';
 import { PLATFORM_NAME, PLUGIN_NAME } from './constants';
-import { BulbConfig } from './types';
+import { BulbConfig, validatePlatformConfig, PlatformConfigType } from './types';
 import { MagicBlueBulbAccessory } from './accessory';
 
 /**
@@ -24,8 +24,19 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
     // Track restored cached accessories
     public readonly accessories: PlatformAccessory[] = [];
 
+    private readonly validatedConfig: PlatformConfigType;
+
     constructor(public readonly log: Logger, public readonly config: PlatformConfig, public readonly api: API) {
         this.log.debug('Finished initializing platform:', this.config.name);
+
+        // Validate configuration using Zod
+        try {
+            this.validatedConfig = validatePlatformConfig(this.config);
+            this.log.debug('Configuration validated successfully');
+        } catch (error) {
+            this.log.error('Configuration validation failed:', error instanceof Error ? error.message : String(error));
+            throw error;
+        }
 
         // When this event is fired it means Homebridge has restored all cached accessories from disk.
         this.api.on('didFinishLaunching', () => {
@@ -51,13 +62,15 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
      * This method reads the bulb configurations from the platform config and creates accessories for each bulb.
      */
     discoverDevices(): void {
-        // Get bulbs from config
-        const bulbs = (this.config.bulbs as BulbConfig[]) || [];
+        // Get bulbs from validated config
+        const bulbs = this.validatedConfig.bulbs;
 
         if (bulbs.length === 0) {
             this.log.warn('No bulbs configured in platform settings');
             return;
         }
+
+        this.log.info(`Discovered ${bulbs.length} bulb(s) in configuration`);
 
         // Loop over the discovered devices and register each one if it has not already been registered
         for (const bulb of bulbs) {

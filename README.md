@@ -43,6 +43,23 @@ Add this platform to your homebridge `config.json`:
 }
 ```
 
+## Configuration Validation
+
+This plugin uses **Zod** for runtime configuration validation, providing enhanced error reporting and type safety:
+
+-   **MAC Address Validation**: Ensures MAC addresses follow the correct format (e.g., `AA:BB:CC:DD:EE:FF` or `aa-bb-cc-dd-ee-ff`)
+-   **Required Fields**: Validates that essential fields like `name` and `mac` are present and non-empty
+-   **Type Safety**: Ensures numeric fields like `handle` are proper integers
+-   **Clear Error Messages**: Provides detailed error messages when configuration is invalid
+
+### Example Validation Errors
+
+If you provide an invalid configuration, you'll see helpful error messages in the Homebridge logs:
+
+```
+[Magic Blue Bulbs] Configuration validation failed: mac: Invalid MAC address format, name: Bulb name is required
+```
+
 ### Platform Configuration Options
 
 | Key        | Description                                        |
