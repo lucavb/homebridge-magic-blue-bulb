@@ -61,6 +61,9 @@ alwaysApply: true
 - Document Magic Blue protocol specifics and BLE command formats
 - Explain color conversion logic and HomeKit characteristic mappings
 - Do NOT add obvious comments like `// Set the hue value` for `this.hue = value`
+- **NEVER generate needless markdown documentation files** for migrations, refactoring, or code changes
+- Only create documentation files when explicitly requested by the user
+- Focus on code quality and functionality rather than documentation artifacts
 
 ### Error Handling
 - Use proper BLE connection error handling
