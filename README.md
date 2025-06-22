@@ -47,10 +47,10 @@ Add this platform to your homebridge `config.json`:
 
 This plugin uses **Zod** for runtime configuration validation, providing enhanced error reporting and type safety:
 
--   **MAC Address Validation**: Ensures MAC addresses follow the correct format (e.g., `AA:BB:CC:DD:EE:FF` or `aa-bb-cc-dd-ee-ff`)
--   **Required Fields**: Validates that essential fields like `name` and `mac` are present and non-empty
--   **Type Safety**: Ensures numeric fields like `handle` are proper integers
--   **Clear Error Messages**: Provides detailed error messages when configuration is invalid
+- **MAC Address Validation**: Ensures MAC addresses follow the correct format (e.g., `AA:BB:CC:DD:EE:FF` or `aa-bb-cc-dd-ee-ff`)
+- **Required Fields**: Validates that essential fields like `name` and `mac` are present and non-empty
+- **Type Safety**: Ensures numeric fields like `handle` are proper integers
+- **Clear Error Messages**: Provides detailed error messages when configuration is invalid
 
 ### Example Validation Errors
 
@@ -120,10 +120,10 @@ If you're upgrading from v1.x, you'll need to update your configuration from an 
 
 The new platform plugin architecture provides several advantages:
 
--   **Multiple Bulbs**: Easily manage multiple Magic Blue bulbs from a single platform configuration
--   **Better Performance**: Improved caching and accessory management
--   **Future-Proof**: Uses Homebridge's recommended modern architecture
--   **Easier Management**: Centralized configuration for all your Magic Blue devices
+- **Multiple Bulbs**: Easily manage multiple Magic Blue bulbs from a single platform configuration
+- **Better Performance**: Improved caching and accessory management
+- **Future-Proof**: Uses Homebridge's recommended modern architecture
+- **Easier Management**: Centralized configuration for all your Magic Blue devices
 
 ## Finding Your Bulb's MAC Address
 
@@ -189,9 +189,9 @@ homebridge-magic-blue-bulb/
 
 ## Requirements
 
--   Node.js >= 14.0.0
--   Homebridge >= 1.3.0
--   Bluetooth LE support on your system
+- Node.js >= 14.0.0
+- Homebridge >= 1.3.0
+- Bluetooth LE support on your system
 
 ## Issues
 
@@ -199,8 +199,8 @@ This software comes with no warranty. It works for me and it might for you. If y
 
 ## Credits
 
--   Bluetooth protocol discovered by the author of [this post](https://bene.tweakblogs.net/blog/12447/connect-a-bluetooth-lightbulb-to-philips-hue) and used in [this repository](https://github.com/b0tting/magicbluehue)
--   Color conversion methods by Garry Tan - [see his post here](http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c)
+- Bluetooth protocol discovered by the author of [this post](https://bene.tweakblogs.net/blog/12447/connect-a-bluetooth-lightbulb-to-philips-hue) and used in [this repository](https://github.com/b0tting/magicbluehue)
+- Color conversion methods by Garry Tan - [see his post here](http://axonflux.com/handy-rgb-to-hsl-and-rgb-to-hsv-color-model-c)
 
 ## License
 

@@ -19,7 +19,11 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
 
     private readonly validatedConfig: PlatformConfigType;
 
-    constructor(public readonly log: Logger, public readonly config: PlatformConfig, public readonly api: API) {
+    constructor(
+        public readonly log: Logger,
+        public readonly config: PlatformConfig,
+        public readonly api: API,
+    ) {
         this.log.debug('Finished initializing platform:', this.config.name);
 
         try {
