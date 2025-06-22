@@ -1,0 +1,141 @@
+{
+    "pluginAlias": "MagicBlueBulbPlatform",
+    "pluginType": "platform",
+    "singular": false,
+    "strictValidation": true,
+    "headerDisplay": "Configure your MagicBlue LED Bulbs via Bluetooth Low Energy (BLE). Make sure your Homebridge system has Bluetooth capabilities and the bulbs are within range.",
+    "footerDisplay": "For help and examples, please see the [plugin documentation](https://github.com/lucavb/homebridge-magic-blue-bulb#readme).",
+    "schema": {
+        "type": "object",
+        "properties": {
+            "name": {
+                "title": "Platform Name",
+                "type": "string",
+                "default": "Magic Blue Bulbs",
+                "minLength": 1,
+                "description": "The name for this platform instance"
+            },
+            "platform": {
+                "type": "string",
+                "const": "MagicBlueBulbPlatform"
+            },
+            "bulbs": {
+                "title": "Bulb Configurations",
+                "type": "array",
+                "minItems": 1,
+                "description": "Configure each MagicBlue bulb you want to control",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "name": {
+                            "title": "Bulb Name",
+                            "type": "string",
+                            "minLength": 1,
+                            "placeholder": "Living Room Light",
+                            "description": "The name for this bulb as it will appear in HomeKit"
+                        },
+                        "mac": {
+                            "title": "MAC Address",
+                            "type": "string",
+                            "pattern": "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+                            "placeholder": "AA:BB:CC:DD:EE:FF",
+                            "description": "The Bluetooth MAC address of the bulb (format: AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF)"
+                        },
+                        "handle": {
+                            "title": "BLE Handle (Optional)",
+                            "type": "integer",
+                            "minimum": 1,
+                            "placeholder": 43,
+                            "description": "Optional: BLE characteristic handle if non-standard (usually auto-detected)"
+                        },
+                        "manufacturer": {
+                            "title": "Manufacturer (Optional)",
+                            "type": "string",
+                            "placeholder": "MagicBlue",
+                            "description": "Optional: Manufacturer name for HomeKit display"
+                        },
+                        "model": {
+                            "title": "Model (Optional)",
+                            "type": "string",
+                            "placeholder": "Magic Blue v2",
+                            "description": "Optional: Model name for HomeKit display"
+                        },
+                        "serial": {
+                            "title": "Serial Number (Optional)",
+                            "type": "string",
+                            "placeholder": "MB001234",
+                            "description": "Optional: Serial number for HomeKit display"
+                        }
+                    },
+                    "required": ["name", "mac"]
+                }
+            }
+        },
+        "required": ["name", "platform", "bulbs"]
+    },
+    "layout": [
+        {
+            "type": "fieldset",
+            "title": "Platform Settings",
+            "expandable": true,
+            "expanded": false,
+            "items": ["name"]
+        },
+        {
+            "type": "fieldset",
+            "title": "Bulb Configuration",
+            "expandable": true,
+            "expanded": true,
+            "items": [
+                {
+                    "key": "bulbs",
+                    "type": "array",
+                    "orderable": true,
+                    "buttonText": "Add Bulb",
+                    "items": [
+                        {
+                            "type": "fieldset",
+                            "title": "{{ bulbs[arrayIndex].name || 'New Bulb' }}",
+                            "expandable": true,
+                            "expanded": true,
+                            "items": [
+                                {
+                                    "key": "bulbs[].name",
+                                    "type": "string"
+                                },
+                                {
+                                    "key": "bulbs[].mac",
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "fieldset",
+                                    "title": "Optional Settings",
+                                    "expandable": true,
+                                    "expanded": false,
+                                    "items": [
+                                        {
+                                            "key": "bulbs[].handle",
+                                            "type": "number"
+                                        },
+                                        {
+                                            "key": "bulbs[].manufacturer",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "bulbs[].model",
+                                            "type": "string"
+                                        },
+                                        {
+                                            "key": "bulbs[].serial",
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
