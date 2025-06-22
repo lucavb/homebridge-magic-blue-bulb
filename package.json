@@ -40,7 +40,7 @@
     "homepage": "https://github.com/lucavb/homebridge-magic-blue-bulb#readme",
     "engines": {
         "node": "^22.0.0",
-        "homebridge": "^1.10.0"
+        "homebridge": "^1.6.0 || ^2.0.0-beta.0"
     },
     "homebridge": {
         "displayName": "Magic Blue Bulb Platform",
