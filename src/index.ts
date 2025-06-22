@@ -1,32 +1,16 @@
-import { API, Logger, AccessoryPlugin, AccessoryConfig } from 'homebridge';
+import { API, Logger, AccessoryPlugin } from 'homebridge';
 import * as noble from 'noble';
 import { Peripheral } from 'noble';
 import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
-
-let Service: any;
-let Characteristic: any;
-let HomebridgeAPI: API;
+import { Service, Characteristic } from 'hap-nodejs';
 
 export = (api: API) => {
-    Service = api.hap.Service;
-    Characteristic = api.hap.Characteristic;
-    HomebridgeAPI = api;
-
     api.registerAccessory('homebridge-magic-blue-bulb', 'magic-blue-bulb', MagicBlueBulb);
 };
 
-interface MagicBlueBulbConfig {
-    name: string;
-    mac: string;
-    handle?: number;
-    manufacturer?: string;
-    model?: string;
-    serial?: string;
-}
-
 interface LedsStatus {
     on: boolean;
-    values: [number, number, number]; // HSL values
+    values: [number, number, number];
 }
 
 class MagicBlueBulb implements AccessoryPlugin {
