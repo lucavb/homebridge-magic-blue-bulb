@@ -1,6 +1,6 @@
 {
     "name": "homebridge-magic-blue-bulb",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "description": "Homebridge platform plugin for the MagicBlue LED Lightbulbs",
     "keywords": [
         "automation",
