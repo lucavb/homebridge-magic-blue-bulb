@@ -84,7 +84,7 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
 
             existingAccessory.context.bulb = bulb;
 
-            new MagicBlueBulbAccessory(this, existingAccessory);
+            new MagicBlueBulbAccessory(this.log, this.Service, this.Characteristic, existingAccessory);
         } else {
             this.log.info('Adding new accessory:', bulb.name);
 
@@ -92,7 +92,7 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
 
             accessory.context.bulb = bulb;
 
-            new MagicBlueBulbAccessory(this, accessory);
+            new MagicBlueBulbAccessory(this.log, this.Service, this.Characteristic, accessory);
 
             this.api.registerPlatformAccessories(PLUGIN_NAME, PLATFORM_NAME, [accessory]);
         }

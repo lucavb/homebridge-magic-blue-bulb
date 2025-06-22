@@ -1,19 +1,8 @@
-import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
+import { Service, PlatformAccessory, CharacteristicValue, Characteristic, Logger } from 'homebridge';
 import noble, { Peripheral } from '@stoprocent/noble';
 import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
 import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
 import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
-
-interface MagicBlueBulbPlatform {
-    readonly log: {
-        info(message: string, ...parameters: unknown[]): void;
-        warn(message: string, ...parameters: unknown[]): void;
-        error(message: string, ...parameters: unknown[]): void;
-        debug(message: string, ...parameters: unknown[]): void;
-    };
-    readonly Service: typeof Service;
-    readonly Characteristic: typeof import('homebridge').Characteristic;
-}
 
 /**
  * Magic Blue Bulb Accessory
@@ -28,13 +17,18 @@ export class MagicBlueBulbAccessory {
     private readonly handle: number;
     private peripheral?: Peripheral;
 
-    constructor(private readonly platform: MagicBlueBulbPlatform, private readonly accessory: PlatformAccessory) {
+    constructor(
+        private readonly log: Logger,
+        private readonly homebridgeService: typeof Service,
+        private readonly homebridgeCharacteristic: typeof Characteristic,
+        private readonly accessory: PlatformAccessory,
+    ) {
         let bulb: BulbConfig;
         try {
             bulb = validateBulbConfig(this.accessory.context.bulb);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            this.platform.log.error(`Invalid bulb configuration for ${this.accessory.displayName}: ${errorMessage}`);
+            this.log.error(`Invalid bulb configuration for ${this.accessory.displayName}: ${errorMessage}`);
             throw error;
         }
 
@@ -50,7 +44,7 @@ export class MagicBlueBulbAccessory {
 
         // Initialize BLE discovery asynchronously
         this.findBulb(this.mac).catch((error) => {
-            this.platform.log.error(`Failed to initialize BLE discovery for ${bulb.name}:`, error);
+            this.log.error(`Failed to initialize BLE discovery for ${bulb.name}:`, error);
         });
     }
 
@@ -58,19 +52,19 @@ export class MagicBlueBulbAccessory {
      * Set up accessory information service
      */
     private setupAccessoryInformation(bulb: BulbConfig): void {
-        const accessoryInfo = this.accessory.getService(this.platform.Service.AccessoryInformation);
+        const accessoryInfo = this.accessory.getService(this.homebridgeService.AccessoryInformation);
         if (!accessoryInfo) {
-            this.platform.log.error('AccessoryInformation service not available');
+            this.log.error('AccessoryInformation service not available');
             return;
         }
 
         accessoryInfo
             .setCharacteristic(
-                this.platform.Characteristic.Manufacturer,
+                this.homebridgeCharacteristic.Manufacturer,
                 bulb.manufacturer || DEFAULT_ACCESSORY_INFO.MANUFACTURER,
             )
-            .setCharacteristic(this.platform.Characteristic.Model, bulb.model || DEFAULT_ACCESSORY_INFO.MODEL)
-            .setCharacteristic(this.platform.Characteristic.SerialNumber, bulb.serial || DEFAULT_ACCESSORY_INFO.SERIAL);
+            .setCharacteristic(this.homebridgeCharacteristic.Model, bulb.model || DEFAULT_ACCESSORY_INFO.MODEL)
+            .setCharacteristic(this.homebridgeCharacteristic.SerialNumber, bulb.serial || DEFAULT_ACCESSORY_INFO.SERIAL);
     }
 
     /**
@@ -78,28 +72,28 @@ export class MagicBlueBulbAccessory {
      */
     private setupLightbulbService(bulb: BulbConfig): void {
         this.service =
-            this.accessory.getService(this.platform.Service.Lightbulb) ||
-            this.accessory.addService(this.platform.Service.Lightbulb);
+            this.accessory.getService(this.homebridgeService.Lightbulb) ||
+            this.accessory.addService(this.homebridgeService.Lightbulb);
 
-        this.service.setCharacteristic(this.platform.Characteristic.Name, bulb.name);
+        this.service.setCharacteristic(this.homebridgeCharacteristic.Name, bulb.name);
 
         this.service
-            .getCharacteristic(this.platform.Characteristic.On)
+            .getCharacteristic(this.homebridgeCharacteristic.On)
             .onSet(this.setOn.bind(this))
             .onGet(this.getOn.bind(this));
 
         this.service
-            .getCharacteristic(this.platform.Characteristic.Hue)
+            .getCharacteristic(this.homebridgeCharacteristic.Hue)
             .onSet(this.setHue.bind(this))
             .onGet(this.getHue.bind(this));
 
         this.service
-            .getCharacteristic(this.platform.Characteristic.Saturation)
+            .getCharacteristic(this.homebridgeCharacteristic.Saturation)
             .onSet(this.setSaturation.bind(this))
             .onGet(this.getSaturation.bind(this));
 
         this.service
-            .getCharacteristic(this.platform.Characteristic.Brightness)
+            .getCharacteristic(this.homebridgeCharacteristic.Brightness)
             .onSet(this.setBrightness.bind(this))
             .onGet(this.getBrightness.bind(this));
     }
@@ -118,7 +112,7 @@ export class MagicBlueBulbAccessory {
             // Set up discovery handler
             noble.on('discover', (peripheral: Peripheral) => {
                 if (peripheral.id === mac || peripheral.address === mac) {
-                    this.platform.log.info('Found Magic Blue bulb:', mac);
+                    this.log.info('Found Magic Blue bulb:', mac);
                     this.peripheral = peripheral;
                     noble.stopScanningAsync().catch(console.error); // Stop scanning once found
                     if (callback) {
@@ -127,7 +121,7 @@ export class MagicBlueBulbAccessory {
                 }
             });
         } catch (error) {
-            this.platform.log.error('Error during BLE discovery:', error);
+            this.log.error('Error during BLE discovery:', error);
         }
     }
 
@@ -154,7 +148,7 @@ export class MagicBlueBulbAccessory {
             ]);
 
             if (!this.peripheral) {
-                this.platform.log.error('No peripheral available for color write');
+                this.log.error('No peripheral available for color write');
                 callback();
                 return;
             }
@@ -163,7 +157,7 @@ export class MagicBlueBulbAccessory {
                 await this.peripheral.writeHandleAsync(this.handle, colorCommand, true);
                 callback();
             } catch (error) {
-                this.platform.log.error('BLE: Write handle Error:', error);
+                this.log.error('BLE: Write handle Error:', error);
                 callback();
             }
         };
@@ -177,17 +171,17 @@ export class MagicBlueBulbAccessory {
         if (this.peripheral && this.peripheral.state === 'connected') {
             callback(true);
         } else if (this.peripheral && this.peripheral.state === 'disconnected') {
-            this.platform.log.info('Lost connection to bulb. Attempting reconnect...');
+            this.log.info('Lost connection to bulb. Attempting reconnect...');
             try {
                 await this.peripheral.connectAsync();
-                this.platform.log.info('Reconnect was successful');
+                this.log.info('Reconnect was successful');
                 callback(true);
             } catch (error) {
-                this.platform.log.error('Reconnect was unsuccessful:', error);
+                this.log.error('Reconnect was unsuccessful:', error);
                 callback(false);
             }
         } else {
-            this.platform.log.warn('Bulb not found or not ready for connection');
+            this.log.warn('Bulb not found or not ready for connection');
             callback(false);
         }
     }
@@ -215,10 +209,10 @@ export class MagicBlueBulbAccessory {
                 try {
                     await this.peripheral.writeHandleAsync(this.handle, powerCommand, true);
                     this.ledsStatus.on = boolValue;
-                    this.platform.log.debug('Set Characteristic On ->', boolValue);
+                    this.log.debug('Set Characteristic On ->', boolValue);
                     resolve();
                 } catch (error) {
-                    this.platform.log.error('BLE: Write handle Error:', error);
+                    this.log.error('BLE: Write handle Error:', error);
                     reject(new Error(error instanceof Error ? error.message : String(error)));
                 }
             };
@@ -230,7 +224,7 @@ export class MagicBlueBulbAccessory {
      * Handle getting the On characteristic
      */
     async getOn(): Promise<CharacteristicValue> {
-        this.platform.log.debug('Get Characteristic On ->', this.ledsStatus.on);
+        this.log.debug('Get Characteristic On ->', this.ledsStatus.on);
         return this.ledsStatus.on;
     }
 
@@ -241,7 +235,7 @@ export class MagicBlueBulbAccessory {
         const numValue = value as number;
         return new Promise((resolve) => {
             this.ledsStatus.values[0] = numValue;
-            this.platform.log.debug('Set Characteristic Hue ->', numValue);
+            this.log.debug('Set Characteristic Hue ->', numValue);
 
             if (this.ledsStatus.on) {
                 this.writeColor(() => {
@@ -258,7 +252,7 @@ export class MagicBlueBulbAccessory {
      */
     async getHue(): Promise<CharacteristicValue> {
         const hue = this.ledsStatus.values[0];
-        this.platform.log.debug('Get Characteristic Hue ->', hue);
+        this.log.debug('Get Characteristic Hue ->', hue);
         return hue;
     }
 
@@ -269,7 +263,7 @@ export class MagicBlueBulbAccessory {
         const numValue = value as number;
         return new Promise((resolve) => {
             this.ledsStatus.values[1] = numValue;
-            this.platform.log.debug('Set Characteristic Saturation ->', numValue);
+            this.log.debug('Set Characteristic Saturation ->', numValue);
 
             if (this.ledsStatus.on) {
                 this.writeColor(() => {
@@ -286,7 +280,7 @@ export class MagicBlueBulbAccessory {
      */
     async getSaturation(): Promise<CharacteristicValue> {
         const saturation = this.ledsStatus.values[1];
-        this.platform.log.debug('Get Characteristic Saturation ->', saturation);
+        this.log.debug('Get Characteristic Saturation ->', saturation);
         return saturation;
     }
 
@@ -297,7 +291,7 @@ export class MagicBlueBulbAccessory {
         const numValue = value as number;
         return new Promise((resolve) => {
             this.ledsStatus.values[2] = numValue;
-            this.platform.log.debug('Set Characteristic Brightness ->', numValue);
+            this.log.debug('Set Characteristic Brightness ->', numValue);
 
             if (this.ledsStatus.on) {
                 this.writeColor(() => {
@@ -314,7 +308,7 @@ export class MagicBlueBulbAccessory {
      */
     async getBrightness(): Promise<CharacteristicValue> {
         const brightness = this.ledsStatus.values[2];
-        this.platform.log.debug('Get Characteristic Brightness ->', brightness);
+        this.log.debug('Get Characteristic Brightness ->', brightness);
         return brightness;
     }
 }
