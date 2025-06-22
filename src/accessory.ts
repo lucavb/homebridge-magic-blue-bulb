@@ -64,7 +64,10 @@ export class MagicBlueBulbAccessory {
                 bulb.manufacturer || DEFAULT_ACCESSORY_INFO.MANUFACTURER,
             )
             .setCharacteristic(this.homebridgeCharacteristic.Model, bulb.model || DEFAULT_ACCESSORY_INFO.MODEL)
-            .setCharacteristic(this.homebridgeCharacteristic.SerialNumber, bulb.serial || DEFAULT_ACCESSORY_INFO.SERIAL);
+            .setCharacteristic(
+                this.homebridgeCharacteristic.SerialNumber,
+                bulb.serial || DEFAULT_ACCESSORY_INFO.SERIAL,
+            );
     }
 
     /**
@@ -164,9 +167,6 @@ export class MagicBlueBulbAccessory {
         await this.attemptConnect(temp);
     }
 
-    /**
-     * Attempt to connect to the BLE peripheral
-     */
     private async attemptConnect(callback: (success: boolean) => void): Promise<void> {
         if (this.peripheral && this.peripheral.state === 'connected') {
             callback(true);
@@ -186,9 +186,6 @@ export class MagicBlueBulbAccessory {
         }
     }
 
-    /**
-     * Handle setting the On characteristic
-     */
     async setOn(value: CharacteristicValue): Promise<void> {
         const boolValue = value as boolean;
         const code = boolValue ? BLE_COMMANDS.TURN_ON : BLE_COMMANDS.TURN_OFF;
@@ -220,17 +217,11 @@ export class MagicBlueBulbAccessory {
         });
     }
 
-    /**
-     * Handle getting the On characteristic
-     */
     async getOn(): Promise<CharacteristicValue> {
         this.log.debug('Get Characteristic On ->', this.ledsStatus.on);
         return this.ledsStatus.on;
     }
 
-    /**
-     * Handle setting the Hue characteristic
-     */
     async setHue(value: CharacteristicValue): Promise<void> {
         const numValue = value as number;
         return new Promise((resolve) => {
@@ -247,18 +238,12 @@ export class MagicBlueBulbAccessory {
         });
     }
 
-    /**
-     * Handle getting the Hue characteristic
-     */
     async getHue(): Promise<CharacteristicValue> {
         const hue = this.ledsStatus.values[0];
         this.log.debug('Get Characteristic Hue ->', hue);
         return hue;
     }
 
-    /**
-     * Handle setting the Saturation characteristic
-     */
     async setSaturation(value: CharacteristicValue): Promise<void> {
         const numValue = value as number;
         return new Promise((resolve) => {
@@ -275,18 +260,12 @@ export class MagicBlueBulbAccessory {
         });
     }
 
-    /**
-     * Handle getting the Saturation characteristic
-     */
     async getSaturation(): Promise<CharacteristicValue> {
         const saturation = this.ledsStatus.values[1];
         this.log.debug('Get Characteristic Saturation ->', saturation);
         return saturation;
     }
 
-    /**
-     * Handle setting the Brightness characteristic
-     */
     async setBrightness(value: CharacteristicValue): Promise<void> {
         const numValue = value as number;
         return new Promise((resolve) => {
@@ -303,9 +282,6 @@ export class MagicBlueBulbAccessory {
         });
     }
 
-    /**
-     * Handle getting the Brightness characteristic
-     */
     async getBrightness(): Promise<CharacteristicValue> {
         const brightness = this.ledsStatus.values[2];
         this.log.debug('Get Characteristic Brightness ->', brightness);
