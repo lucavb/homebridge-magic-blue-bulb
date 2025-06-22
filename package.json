@@ -2,9 +2,23 @@
     "name": "homebridge-magic-blue-bulb",
     "version": "2.0.0",
     "description": "Homebridge platform plugin for the MagicBlue LED Lightbulbs",
-    "main": "dist/cjs/index.cjs",
-    "module": "dist/esm/index.mjs",
-    "types": "dist/types/index.d.ts",
+    "keywords": [
+        "homebridge-plugin"
+    ],
+    "homepage": "https://github.com/lucavb/homebridge-magic-blue-bulb#readme",
+    "bugs": {
+        "url": "https://github.com/lucavb/homebridge-magic-blue-bulb/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lucavb/homebridge-magic-blue-bulb.git"
+    },
+    "license": "GPL-3.0",
+    "author": {
+        "name": "Luca Becker",
+        "email": "hello@luca-becker.me",
+        "url": "https://luca-becker.me"
+    },
     "exports": {
         ".": {
             "require": "./dist/cjs/index.cjs",
@@ -12,48 +26,25 @@
             "types": "./dist/types/index.d.ts"
         }
     },
+    "main": "dist/cjs/index.cjs",
+    "module": "dist/esm/index.mjs",
+    "types": "dist/types/index.d.ts",
     "files": [
         "dist"
     ],
     "scripts": {
+        "build": "rollup -c rollup.config.ts --configPlugin typescript",
         "build:dev": "rollup -c rollup.config.ts --configPlugin typescript --watch",
         "build:legacy": "tsc",
-        "build": "rollup -c rollup.config.ts --configPlugin typescript",
-        "cq:format:check": "prettier --check .",
-        "cq:format": "prettier --write .",
-        "cq:lint:fix": "eslint . --fix",
-        "cq:lint": "eslint .",
-        "cq:typecheck": "tsc --noEmit",
         "cq": "npm run cq:lint && npm run cq:format:check && npm run cq:typecheck",
+        "cq:format": "prettier --write .",
+        "cq:format:check": "prettier --check .",
+        "cq:lint": "eslint .",
+        "cq:lint:fix": "eslint . --fix",
+        "cq:typecheck": "tsc --noEmit",
         "prepublishOnly": "npm run build",
         "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "rollup -c rollup.config.ts --configPlugin typescript --watch"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/lucavb/homebridge-magic-blue-bulb.git"
-    },
-    "keywords": [
-        "homebridge-plugin"
-    ],
-    "author": {
-        "name": "Luca Becker",
-        "email": "hello@luca-becker.me",
-        "url": "https://luca-becker.me"
-    },
-    "license": "GPL-3.0",
-    "bugs": {
-        "url": "https://github.com/lucavb/homebridge-magic-blue-bulb/issues"
-    },
-    "homepage": "https://github.com/lucavb/homebridge-magic-blue-bulb#readme",
-    "engines": {
-        "node": "^22.0.0",
-        "homebridge": "^1.6.0 || ^2.0.0-beta.0"
-    },
-    "homebridge": {
-        "displayName": "Magic Blue Bulb Platform",
-        "platformName": "MagicBlueBulbPlatform",
-        "pluginAlias": "homebridge-magic-blue-bulb"
     },
     "dependencies": {
         "@stoprocent/noble": "2.3.2",
@@ -72,5 +63,14 @@
         "tslib": "2.8.1",
         "typescript": "5.8.3",
         "typescript-eslint": "8.34.1"
+    },
+    "engines": {
+        "homebridge": "^1.6.0 || ^2.0.0-beta.0",
+        "node": "^22.0.0"
+    },
+    "homebridge": {
+        "displayName": "Magic Blue Bulb Platform",
+        "platformName": "MagicBlueBulbPlatform",
+        "pluginAlias": "homebridge-magic-blue-bulb"
     }
 }
