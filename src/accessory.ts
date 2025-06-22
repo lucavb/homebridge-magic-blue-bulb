@@ -1,6 +1,6 @@
 import { Service, PlatformAccessory, CharacteristicValue, Characteristic, Logger } from 'homebridge';
 import noble, { Peripheral } from '@stoprocent/noble';
-import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
+import { hslToRgb, rgbToHsl } from './rgbConversion';
 import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
 import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
 
@@ -68,25 +68,19 @@ export class MagicBlueBulbAccessory {
 
         service.setCharacteristic(this.homebridgeCharacteristic.Name, bulb.name);
 
-        service
-            .getCharacteristic(this.homebridgeCharacteristic.On)
-            .onSet(this.setOn.bind(this))
-            .onGet(this.getOn.bind(this));
+        service.getCharacteristic(this.homebridgeCharacteristic.On).onSet(this.setOn).onGet(this.getOn);
 
-        service
-            .getCharacteristic(this.homebridgeCharacteristic.Hue)
-            .onSet(this.setHue.bind(this))
-            .onGet(this.getHue.bind(this));
+        service.getCharacteristic(this.homebridgeCharacteristic.Hue).onSet(this.setHue).onGet(this.getHue);
 
         service
             .getCharacteristic(this.homebridgeCharacteristic.Saturation)
-            .onSet(this.setSaturation.bind(this))
-            .onGet(this.getSaturation.bind(this));
+            .onSet(this.setSaturation)
+            .onGet(this.getSaturation);
 
         service
             .getCharacteristic(this.homebridgeCharacteristic.Brightness)
-            .onSet(this.setBrightness.bind(this))
-            .onGet(this.getBrightness.bind(this));
+            .onSet(this.setBrightness)
+            .onGet(this.getBrightness);
         return service;
     }
 
@@ -162,7 +156,7 @@ export class MagicBlueBulbAccessory {
         }
     }
 
-    async setOn(value: CharacteristicValue): Promise<void> {
+    private setOn = async (value: CharacteristicValue): Promise<void> => {
         if (typeof value !== 'boolean') {
             return;
         }
@@ -187,14 +181,14 @@ export class MagicBlueBulbAccessory {
             this.log.error('BLE: Write handle Error:', error);
             throw new Error(error instanceof Error ? error.message : String(error));
         }
-    }
+    };
 
-    async getOn(): Promise<CharacteristicValue> {
+    private getOn = async (): Promise<CharacteristicValue> => {
         this.log.debug('Get Characteristic On ->', this.ledsStatus.on);
         return this.ledsStatus.on;
-    }
+    };
 
-    async setHue(value: CharacteristicValue): Promise<void> {
+    private setHue = async (value: CharacteristicValue): Promise<void> => {
         if (typeof value !== 'number') {
             return;
         }
@@ -204,15 +198,15 @@ export class MagicBlueBulbAccessory {
         if (this.ledsStatus.on) {
             await this.writeColor();
         }
-    }
+    };
 
-    async getHue(): Promise<CharacteristicValue> {
+    private getHue = async (): Promise<CharacteristicValue> => {
         const hue = this.ledsStatus.values.hue;
         this.log.debug('Get Characteristic Hue ->', hue);
         return hue;
-    }
+    };
 
-    async setSaturation(value: CharacteristicValue): Promise<void> {
+    private setSaturation = async (value: CharacteristicValue): Promise<void> => {
         if (typeof value !== 'number') {
             return;
         }
@@ -222,15 +216,15 @@ export class MagicBlueBulbAccessory {
         if (this.ledsStatus.on) {
             await this.writeColor();
         }
-    }
+    };
 
-    async getSaturation(): Promise<CharacteristicValue> {
+    private getSaturation = async (): Promise<CharacteristicValue> => {
         const saturation = this.ledsStatus.values.saturation;
         this.log.debug('Get Characteristic Saturation ->', saturation);
         return saturation;
-    }
+    };
 
-    async setBrightness(value: CharacteristicValue): Promise<void> {
+    private setBrightness = async (value: CharacteristicValue): Promise<void> => {
         if (typeof value !== 'number') {
             return;
         }
@@ -240,11 +234,11 @@ export class MagicBlueBulbAccessory {
         if (this.ledsStatus.on) {
             await this.writeColor();
         }
-    }
+    };
 
-    async getBrightness(): Promise<CharacteristicValue> {
+    private getBrightness = async (): Promise<CharacteristicValue> => {
         const brightness = this.ledsStatus.values.lightness;
         this.log.debug('Get Characteristic Brightness ->', brightness);
         return brightness;
-    }
+    };
 }
