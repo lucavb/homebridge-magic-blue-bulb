@@ -131,58 +131,50 @@ export class MagicBlueBulbAccessory {
     /**
      * Write color data to the bulb via BLE
      */
-    private async writeColor(callback: () => void): Promise<void> {
-        const temp = async (res: boolean): Promise<void> => {
-            if (!res) {
-                return;
-            }
-            const rgb: RgbColor = hslToRgb(
-                this.ledsStatus.values[0],
-                this.ledsStatus.values[1],
-                this.ledsStatus.values[2],
-            );
+    private async writeColor(): Promise<void> {
+        const connected = await this.attemptConnect();
+        if (!connected) {
+            return;
+        }
 
-            const colorCommand = Buffer.from([
-                ...BLE_COMMANDS.COLOR_COMMAND_PREFIX,
-                rgb.r,
-                rgb.g,
-                rgb.b,
-                ...BLE_COMMANDS.COLOR_COMMAND_SUFFIX,
-            ]);
+        const rgb: RgbColor = hslToRgb(this.ledsStatus.values[0], this.ledsStatus.values[1], this.ledsStatus.values[2]);
 
-            if (!this.peripheral) {
-                this.log.error('No peripheral available for color write');
-                callback();
-                return;
-            }
+        const colorCommand = Buffer.from([
+            ...BLE_COMMANDS.COLOR_COMMAND_PREFIX,
+            rgb.r,
+            rgb.g,
+            rgb.b,
+            ...BLE_COMMANDS.COLOR_COMMAND_SUFFIX,
+        ]);
 
-            try {
-                await this.peripheral.writeHandleAsync(this.handle, colorCommand, true);
-                callback();
-            } catch (error) {
-                this.log.error('BLE: Write handle Error:', error);
-                callback();
-            }
-        };
-        await this.attemptConnect(temp);
+        if (!this.peripheral) {
+            this.log.error('No peripheral available for color write');
+            return;
+        }
+
+        try {
+            await this.peripheral.writeHandleAsync(this.handle, colorCommand, true);
+        } catch (error) {
+            this.log.error('BLE: Write handle Error:', error);
+        }
     }
 
-    private async attemptConnect(callback: (success: boolean) => void): Promise<void> {
+    private async attemptConnect(): Promise<boolean> {
         if (this.peripheral && this.peripheral.state === 'connected') {
-            callback(true);
+            return true;
         } else if (this.peripheral && this.peripheral.state === 'disconnected') {
             this.log.info('Lost connection to bulb. Attempting reconnect...');
             try {
                 await this.peripheral.connectAsync();
                 this.log.info('Reconnect was successful');
-                callback(true);
+                return true;
             } catch (error) {
                 this.log.error('Reconnect was unsuccessful:', error);
-                callback(false);
+                return false;
             }
         } else {
             this.log.warn('Bulb not found or not ready for connection');
-            callback(false);
+            return false;
         }
     }
 
@@ -190,31 +182,25 @@ export class MagicBlueBulbAccessory {
         const boolValue = value as boolean;
         const code = boolValue ? BLE_COMMANDS.TURN_ON : BLE_COMMANDS.TURN_OFF;
 
-        return new Promise((resolve, reject) => {
-            const temp = async (res: boolean): Promise<void> => {
-                if (!this.peripheral || !res) {
-                    reject(new Error('Could not connect to peripheral'));
-                    return;
-                }
+        const connected = await this.attemptConnect();
+        if (!connected || !this.peripheral) {
+            throw new Error('Could not connect to peripheral');
+        }
 
-                const powerCommand = Buffer.from([
-                    ...BLE_COMMANDS.POWER_COMMAND_PREFIX,
-                    code,
-                    ...BLE_COMMANDS.POWER_COMMAND_SUFFIX,
-                ]);
+        const powerCommand = Buffer.from([
+            ...BLE_COMMANDS.POWER_COMMAND_PREFIX,
+            code,
+            ...BLE_COMMANDS.POWER_COMMAND_SUFFIX,
+        ]);
 
-                try {
-                    await this.peripheral.writeHandleAsync(this.handle, powerCommand, true);
-                    this.ledsStatus.on = boolValue;
-                    this.log.debug('Set Characteristic On ->', boolValue);
-                    resolve();
-                } catch (error) {
-                    this.log.error('BLE: Write handle Error:', error);
-                    reject(new Error(error instanceof Error ? error.message : String(error)));
-                }
-            };
-            this.attemptConnect(temp).catch(reject);
-        });
+        try {
+            await this.peripheral.writeHandleAsync(this.handle, powerCommand, true);
+            this.ledsStatus.on = boolValue;
+            this.log.debug('Set Characteristic On ->', boolValue);
+        } catch (error) {
+            this.log.error('BLE: Write handle Error:', error);
+            throw new Error(error instanceof Error ? error.message : String(error));
+        }
     }
 
     async getOn(): Promise<CharacteristicValue> {
@@ -224,18 +210,12 @@ export class MagicBlueBulbAccessory {
 
     async setHue(value: CharacteristicValue): Promise<void> {
         const numValue = value as number;
-        return new Promise((resolve) => {
-            this.ledsStatus.values[0] = numValue;
-            this.log.debug('Set Characteristic Hue ->', numValue);
+        this.ledsStatus.values[0] = numValue;
+        this.log.debug('Set Characteristic Hue ->', numValue);
 
-            if (this.ledsStatus.on) {
-                this.writeColor(() => {
-                    resolve();
-                });
-            } else {
-                resolve();
-            }
-        });
+        if (this.ledsStatus.on) {
+            await this.writeColor();
+        }
     }
 
     async getHue(): Promise<CharacteristicValue> {
@@ -246,18 +226,12 @@ export class MagicBlueBulbAccessory {
 
     async setSaturation(value: CharacteristicValue): Promise<void> {
         const numValue = value as number;
-        return new Promise((resolve) => {
-            this.ledsStatus.values[1] = numValue;
-            this.log.debug('Set Characteristic Saturation ->', numValue);
+        this.ledsStatus.values[1] = numValue;
+        this.log.debug('Set Characteristic Saturation ->', numValue);
 
-            if (this.ledsStatus.on) {
-                this.writeColor(() => {
-                    resolve();
-                });
-            } else {
-                resolve();
-            }
-        });
+        if (this.ledsStatus.on) {
+            await this.writeColor();
+        }
     }
 
     async getSaturation(): Promise<CharacteristicValue> {
@@ -268,18 +242,12 @@ export class MagicBlueBulbAccessory {
 
     async setBrightness(value: CharacteristicValue): Promise<void> {
         const numValue = value as number;
-        return new Promise((resolve) => {
-            this.ledsStatus.values[2] = numValue;
-            this.log.debug('Set Characteristic Brightness ->', numValue);
+        this.ledsStatus.values[2] = numValue;
+        this.log.debug('Set Characteristic Brightness ->', numValue);
 
-            if (this.ledsStatus.on) {
-                this.writeColor(() => {
-                    resolve();
-                });
-            } else {
-                resolve();
-            }
-        });
+        if (this.ledsStatus.on) {
+            await this.writeColor();
+        }
     }
 
     async getBrightness(): Promise<CharacteristicValue> {
