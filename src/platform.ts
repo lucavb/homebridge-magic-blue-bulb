@@ -11,12 +11,6 @@ import { PLATFORM_NAME, PLUGIN_NAME } from './constants';
 import { BulbConfig, validatePlatformConfig, PlatformConfigType } from './types';
 import { MagicBlueBulbAccessory } from './accessory';
 
-/**
- * Magic Blue Bulb Platform Plugin
- *
- * This platform plugin manages multiple Magic Blue LED bulbs through a single platform configuration.
- * It implements the DynamicPlatformPlugin interface to support dynamic accessory discovery and management.
- */
 export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
     public readonly Service: typeof Service = this.api.hap.Service;
     public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
@@ -42,20 +36,12 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
         });
     }
 
-    /**
-     * This function is invoked when homebridge restores cached accessories from disk at startup.
-     * We should use this opportunity to setup event handlers for characteristics and update respective values.
-     */
     configureAccessory(accessory: PlatformAccessory): void {
         this.log.info('Loading accessory from cache:', accessory.displayName);
 
         this.accessories.push(accessory);
     }
 
-    /**
-     * Discover and register Magic Blue bulb accessories.
-     * This method reads the bulb configurations from the platform config and creates accessories for each bulb.
-     */
     discoverDevices(): void {
         const bulbs = this.validatedConfig.bulbs;
 
@@ -71,9 +57,6 @@ export class MagicBlueBulbPlatform implements DynamicPlatformPlugin {
         }
     }
 
-    /**
-     * Register a single bulb as an accessory
-     */
     private registerBulb(bulb: BulbConfig): void {
         const uuid = this.api.hap.uuid.generate(bulb.mac);
 
