@@ -3,7 +3,21 @@
     "version": "2.0.0",
     "description": "Homebridge platform plugin for the MagicBlue LED Lightbulbs",
     "keywords": [
-        "homebridge-plugin"
+        "automation",
+        "ble",
+        "bluetooth",
+        "bulb",
+        "color",
+        "homebridge-plugin",
+        "homebridge",
+        "homekit",
+        "iot",
+        "led",
+        "light",
+        "lighting",
+        "magic-blue",
+        "rgb",
+        "smart-home"
     ],
     "homepage": "https://github.com/lucavb/homebridge-magic-blue-bulb#readme",
     "bugs": {
