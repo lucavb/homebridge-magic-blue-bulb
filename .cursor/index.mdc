@@ -1,0 +1,109 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# Homebridge Magic Blue Bulb Project Rules
+
+## Project Overview
+- **Purpose**: Homebridge accessory plugin for Magic Blue Bluetooth smart bulbs
+- **Architecture**: TypeScript-based Homebridge accessory plugin with Bluetooth Low Energy (BLE) communication
+- **Tech Stack**: TypeScript, Node.js, Homebridge API, HAP-NodeJS, Noble (Bluetooth), HSL/RGB color conversion
+- **Target**: Magic Blue brand Bluetooth LED light bulbs integration with HomeKit
+
+## Homebridge Plugin Development Standards
+
+### Accessory Plugin Architecture
+- Use accessory plugin pattern following Homebridge best practices
+- Register accessory in `src/index.ts` using `api.registerAccessory()`
+- Implement `AccessoryPlugin` interface in accessory class
+- Support individual bulb instances per accessory configuration
+
+### TypeScript Patterns
+- Use strict TypeScript configuration with ES6 target
+- Export using `export =` syntax for Homebridge compatibility
+- Implement proper interfaces for all plugin components
+- Use proper typing for Noble Bluetooth interactions and color conversion
+
+### Homebridge API Usage
+- Use modern HAP-NodeJS APIs (avoid deprecated patterns)
+- Implement proper Lightbulb service and characteristic handling
+- Support On/Off, Hue, Saturation, and Brightness characteristics
+- Follow Homebridge accessory plugin guidelines
+- Use proper logging via accessory log methods
+
+### Configuration Management
+- Support MAC address configuration for bulb identification
+- Handle different Magic Blue bulb versions (different BLE handles)
+- Support optional manufacturer, model, and serial number customization
+- Implement proper error handling for invalid MAC addresses and BLE connection failures
+
+## Code Quality Standards
+
+### File Organization
+- `src/index.ts` - Plugin entry point, registration, and main accessory class
+- `src/rgbConversion.ts` - HSL/RGB color space conversion utilities
+- `src/types/noble.d.ts` - TypeScript definitions for Noble Bluetooth library
+- Configuration via Homebridge config.json accessory entries
+
+### Naming Conventions
+- Accessory class: `MagicBlueBulb`
+- Color interfaces: `RgbColor`, `HslColor`
+- BLE-related: camelCase (peripheral, writeHandle, etc.)
+- Constants: UPPER_SNAKE_CASE
+- Variables/functions: camelCase
+- Types/interfaces: PascalCase
+
+### Error Handling
+- Use proper BLE connection error handling
+- Implement graceful degradation for Bluetooth connection failures
+- Log BLE errors with appropriate severity levels
+- Handle peripheral disconnection and automatic reconnection
+- Validate all configuration inputs (MAC addresses, handle values)
+
+### Color Management
+- Support full HSL color space for HomeKit compatibility
+- Implement accurate HSL ↔ RGB conversion algorithms
+- Handle color state synchronization between HomeKit and bulb
+- Support proper brightness, hue, and saturation characteristics
+
+## Development Workflow
+
+### Build Process
+- Use TypeScript compiler with declaration files
+- Output to `dist/` directory
+- Include proper npm scripts for build, clean, watch
+- Support prepublish builds
+
+### Code Quality Tools
+- ESLint with TypeScript support (eslint.config.mts)
+- Follow typescript-standards cursor rules (no 'any' types)
+- Proper type definitions for all Bluetooth and color operations
+
+## Bluetooth Integration Guidelines
+
+### BLE Communication
+- Use Noble library for cross-platform Bluetooth Low Energy support
+- Implement proper peripheral scanning and connection management
+- Handle different Magic Blue bulb versions with configurable BLE handles
+- Support automatic peripheral discovery by MAC address
+- Implement connection retry logic for reliability
+
+### Magic Blue Protocol
+- Use correct BLE write commands for color control (0x56 prefix)
+- Handle on/off commands (0xcc with 0x23/0x24 codes)
+- Support RGB color values in BLE command structure
+- Implement proper command formatting and checksums
+
+### Connection Management
+- Monitor peripheral connection state
+- Implement automatic reconnection on disconnection
+- Handle Bluetooth adapter state changes (powered on/off)
+- Log connection status and errors appropriately
+- Support graceful handling of multiple bulb instances
+
+### Color Synchronization
+- Maintain internal color state (HSL values)
+- Sync HomeKit characteristic changes to bulb hardware
+- Handle bulb state queries from HomeKit
+- Support instant color updates and smooth transitions
