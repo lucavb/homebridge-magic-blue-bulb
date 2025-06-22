@@ -16,14 +16,18 @@
         "dist"
     ],
     "scripts": {
-        "build": "rollup -c rollup.config.ts --configPlugin typescript",
         "build:dev": "rollup -c rollup.config.ts --configPlugin typescript --watch",
         "build:legacy": "tsc",
-        "watch": "rollup -c rollup.config.ts --configPlugin typescript --watch",
+        "build": "rollup -c rollup.config.ts --configPlugin typescript",
+        "cq:format:check": "prettier --check .",
+        "cq:format": "prettier --write .",
+        "cq:lint:fix": "eslint . --fix",
+        "cq:lint": "eslint .",
+        "cq:typecheck": "tsc --noEmit",
+        "cq": "npm run cq:lint && npm run cq:format:check && npm run cq:typecheck",
         "prepublishOnly": "npm run build",
         "test": "echo \"Error: no test specified\" && exit 1",
-        "lint": "eslint .",
-        "lint:fix": "eslint . --fix"
+        "watch": "rollup -c rollup.config.ts --configPlugin typescript --watch"
     },
     "repository": {
         "type": "git",
