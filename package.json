@@ -37,12 +37,11 @@
         "pluginAlias": "homebridge-magic-blue-bulb"
     },
     "dependencies": {
-        "noble": "1.9.1",
+        "@stoprocent/noble": "2.3.2",
         "zod": "3.25.67"
     },
     "devDependencies": {
         "@eslint/js": "9.29.0",
-        "@types/noble": "0.0.44",
         "@types/node": "^18.0.0",
         "eslint": "9.29.0",
         "homebridge": "^1.6.0",

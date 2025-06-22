@@ -1,6 +1,5 @@
 import { Service, PlatformAccessory, CharacteristicValue } from 'homebridge';
-import * as noble from 'noble';
-import { Peripheral } from 'noble';
+import noble, { Peripheral } from '@stoprocent/noble';
 import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
 import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
 import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
@@ -48,15 +47,24 @@ export class MagicBlueBulbAccessory {
 
         this.setupAccessoryInformation(bulb);
         this.setupLightbulbService(bulb);
-        this.findBulb(this.mac);
+
+        // Initialize BLE discovery asynchronously
+        this.findBulb(this.mac).catch((error) => {
+            this.platform.log.error(`Failed to initialize BLE discovery for ${bulb.name}:`, error);
+        });
     }
 
     /**
      * Set up accessory information service
      */
     private setupAccessoryInformation(bulb: BulbConfig): void {
-        this.accessory
-            .getService(this.platform.Service.AccessoryInformation)!
+        const accessoryInfo = this.accessory.getService(this.platform.Service.AccessoryInformation);
+        if (!accessoryInfo) {
+            this.platform.log.error('AccessoryInformation service not available');
+            return;
+        }
+
+        accessoryInfo
             .setCharacteristic(
                 this.platform.Characteristic.Manufacturer,
                 bulb.manufacturer || DEFAULT_ACCESSORY_INFO.MANUFACTURER,
@@ -99,31 +107,35 @@ export class MagicBlueBulbAccessory {
     /**
      * Discover and connect to the Magic Blue bulb via Bluetooth LE
      */
-    private findBulb(mac: string, callback?: () => void): void {
-        noble.on('stateChange', (state: string) => {
-            if (state === 'poweredOn') {
-                noble.startScanning();
-            } else {
-                noble.stopScanning();
-            }
-        });
+    private async findBulb(mac: string, callback?: () => void): Promise<void> {
+        try {
+            // Wait for Bluetooth adapter to be powered on
+            await noble.waitForPoweredOnAsync();
 
-        noble.on('discover', (peripheral: Peripheral) => {
-            if (peripheral.id === mac || peripheral.address === mac) {
-                this.platform.log.info('Found Magic Blue bulb:', mac);
-                this.peripheral = peripheral;
-                if (callback) {
-                    callback();
+            // Start scanning for devices
+            await noble.startScanningAsync();
+
+            // Set up discovery handler
+            noble.on('discover', (peripheral: Peripheral) => {
+                if (peripheral.id === mac || peripheral.address === mac) {
+                    this.platform.log.info('Found Magic Blue bulb:', mac);
+                    this.peripheral = peripheral;
+                    noble.stopScanningAsync().catch(console.error); // Stop scanning once found
+                    if (callback) {
+                        callback();
+                    }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            this.platform.log.error('Error during BLE discovery:', error);
+        }
     }
 
     /**
      * Write color data to the bulb via BLE
      */
-    private writeColor(callback: () => void): void {
-        const temp = (res: boolean): void => {
+    private async writeColor(callback: () => void): Promise<void> {
+        const temp = async (res: boolean): Promise<void> => {
             if (!res) {
                 return;
             }
@@ -141,33 +153,39 @@ export class MagicBlueBulbAccessory {
                 ...BLE_COMMANDS.COLOR_COMMAND_SUFFIX,
             ]);
 
-            this.peripheral!.writeHandle(this.handle, colorCommand, true, (error?: string | null) => {
-                if (error) {
-                    this.platform.log.error('BLE: Write handle Error:', error);
-                }
+            if (!this.peripheral) {
+                this.platform.log.error('No peripheral available for color write');
                 callback();
-            });
+                return;
+            }
+
+            try {
+                await this.peripheral.writeHandleAsync(this.handle, colorCommand, true);
+                callback();
+            } catch (error) {
+                this.platform.log.error('BLE: Write handle Error:', error);
+                callback();
+            }
         };
-        this.attemptConnect(temp);
+        await this.attemptConnect(temp);
     }
 
     /**
      * Attempt to connect to the BLE peripheral
      */
-    private attemptConnect(callback: (success: boolean) => void): void {
+    private async attemptConnect(callback: (success: boolean) => void): Promise<void> {
         if (this.peripheral && this.peripheral.state === 'connected') {
             callback(true);
         } else if (this.peripheral && this.peripheral.state === 'disconnected') {
             this.platform.log.info('Lost connection to bulb. Attempting reconnect...');
-            this.peripheral.connect((error?: string | null) => {
-                if (!error) {
-                    this.platform.log.info('Reconnect was successful');
-                    callback(true);
-                } else {
-                    this.platform.log.error('Reconnect was unsuccessful:', error);
-                    callback(false);
-                }
-            });
+            try {
+                await this.peripheral.connectAsync();
+                this.platform.log.info('Reconnect was successful');
+                callback(true);
+            } catch (error) {
+                this.platform.log.error('Reconnect was unsuccessful:', error);
+                callback(false);
+            }
         } else {
             this.platform.log.warn('Bulb not found or not ready for connection');
             callback(false);
@@ -182,7 +200,7 @@ export class MagicBlueBulbAccessory {
         const code = boolValue ? BLE_COMMANDS.TURN_ON : BLE_COMMANDS.TURN_OFF;
 
         return new Promise((resolve, reject) => {
-            const temp = (res: boolean): void => {
+            const temp = async (res: boolean): Promise<void> => {
                 if (!this.peripheral || !res) {
                     reject(new Error('Could not connect to peripheral'));
                     return;
@@ -194,18 +212,17 @@ export class MagicBlueBulbAccessory {
                     ...BLE_COMMANDS.POWER_COMMAND_SUFFIX,
                 ]);
 
-                this.peripheral.writeHandle(this.handle, powerCommand, true, (error?: string | null) => {
-                    if (error) {
-                        this.platform.log.error('BLE: Write handle Error:', error);
-                        reject(new Error(error));
-                    } else {
-                        this.ledsStatus.on = boolValue;
-                        this.platform.log.debug('Set Characteristic On ->', boolValue);
-                        resolve();
-                    }
-                });
+                try {
+                    await this.peripheral.writeHandleAsync(this.handle, powerCommand, true);
+                    this.ledsStatus.on = boolValue;
+                    this.platform.log.debug('Set Characteristic On ->', boolValue);
+                    resolve();
+                } catch (error) {
+                    this.platform.log.error('BLE: Write handle Error:', error);
+                    reject(new Error(error instanceof Error ? error.message : String(error)));
+                }
             };
-            this.attemptConnect(temp);
+            this.attemptConnect(temp).catch(reject);
         });
     }
 
