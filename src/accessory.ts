@@ -179,8 +179,10 @@ export class MagicBlueBulbAccessory {
     }
 
     async setOn(value: CharacteristicValue): Promise<void> {
-        const boolValue = value as boolean;
-        const code = boolValue ? BLE_COMMANDS.TURN_ON : BLE_COMMANDS.TURN_OFF;
+        if (typeof value !== 'boolean') {
+            return;
+        }
+        const code = value ? BLE_COMMANDS.TURN_ON : BLE_COMMANDS.TURN_OFF;
 
         const connected = await this.attemptConnect();
         if (!connected || !this.peripheral) {
@@ -195,8 +197,8 @@ export class MagicBlueBulbAccessory {
 
         try {
             await this.peripheral.writeHandleAsync(this.handle, powerCommand, true);
-            this.ledsStatus.on = boolValue;
-            this.log.debug('Set Characteristic On ->', boolValue);
+            this.ledsStatus.on = value;
+            this.log.debug('Set Characteristic On ->', value);
         } catch (error) {
             this.log.error('BLE: Write handle Error:', error);
             throw new Error(error instanceof Error ? error.message : String(error));
@@ -209,9 +211,11 @@ export class MagicBlueBulbAccessory {
     }
 
     async setHue(value: CharacteristicValue): Promise<void> {
-        const numValue = value as number;
-        this.ledsStatus.values[0] = numValue;
-        this.log.debug('Set Characteristic Hue ->', numValue);
+        if (typeof value !== 'number') {
+            return;
+        }
+        this.ledsStatus.values[0] = value;
+        this.log.debug('Set Characteristic Hue ->', value);
 
         if (this.ledsStatus.on) {
             await this.writeColor();
@@ -225,9 +229,11 @@ export class MagicBlueBulbAccessory {
     }
 
     async setSaturation(value: CharacteristicValue): Promise<void> {
-        const numValue = value as number;
-        this.ledsStatus.values[1] = numValue;
-        this.log.debug('Set Characteristic Saturation ->', numValue);
+        if (typeof value !== 'number') {
+            return;
+        }
+        this.ledsStatus.values[1] = value;
+        this.log.debug('Set Characteristic Saturation ->', value);
 
         if (this.ledsStatus.on) {
             await this.writeColor();
@@ -241,9 +247,11 @@ export class MagicBlueBulbAccessory {
     }
 
     async setBrightness(value: CharacteristicValue): Promise<void> {
-        const numValue = value as number;
-        this.ledsStatus.values[2] = numValue;
-        this.log.debug('Set Characteristic Brightness ->', numValue);
+        if (typeof value !== 'number') {
+            return;
+        }
+        this.ledsStatus.values[2] = value;
+        this.log.debug('Set Characteristic Brightness ->', value);
 
         if (this.ledsStatus.on) {
             await this.writeColor();
