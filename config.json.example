@@ -1,0 +1,26 @@
+{
+    "platforms": [
+        {
+            "name": "Magic Blue Bulbs",
+            "platform": "MagicBlueBulbPlatform",
+            "bulbs": [
+                {
+                    "name": "Living Room Light",
+                    "mac": "aa:bb:cc:dd:ee:ff",
+                    "handle": 12,
+                    "manufacturer": "Magic Blue",
+                    "model": "RGB Bulb",
+                    "serial": "MB001"
+                },
+                {
+                    "name": "Bedroom Light",
+                    "mac": "ff:ee:dd:cc:bb:aa",
+                    "handle": 12,
+                    "manufacturer": "Magic Blue",
+                    "model": "RGB Bulb",
+                    "serial": "MB002"
+                }
+            ]
+        }
+    ]
+} 

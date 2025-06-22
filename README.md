@@ -1,6 +1,6 @@
 # Homebridge Magic Blue Bulb
 
-This plugin enables you to control your MagicBlue LED light bulb through HomeKit via Homebridge.
+This plugin enables you to control your MagicBlue LED light bulbs through HomeKit via Homebridge using a dynamic platform plugin.
 
 ## Installation
 
@@ -12,7 +12,61 @@ You may need to use `sudo` with that command.
 
 ## Configuration
 
-Add this to your homebridge `config.json`:
+Add this platform to your homebridge `config.json`:
+
+```json
+{
+    "platforms": [
+        {
+            "name": "Magic Blue Bulbs",
+            "platform": "MagicBlueBulbPlatform",
+            "bulbs": [
+                {
+                    "name": "Living Room Light",
+                    "mac": "FB:00:E0:82:AA:1F",
+                    "handle": 12,
+                    "manufacturer": "Magic Blue",
+                    "model": "RGB Bulb",
+                    "serial": "MB001"
+                },
+                {
+                    "name": "Bedroom Light",
+                    "mac": "AA:BB:CC:DD:EE:FF",
+                    "handle": 12,
+                    "manufacturer": "Magic Blue",
+                    "model": "RGB Bulb",
+                    "serial": "MB002"
+                }
+            ]
+        }
+    ]
+}
+```
+
+### Platform Configuration Options
+
+| Key        | Description                                        |
+| ---------- | -------------------------------------------------- |
+| `name`     | Required. The name of this platform instance       |
+| `platform` | Required. Must be "MagicBlueBulbPlatform"          |
+| `bulbs`    | Required. Array of bulb configurations (see below) |
+
+### Bulb Configuration Options
+
+| Key            | Description                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| `name`         | Required. The name of this bulb in your HomeKit app                                                   |
+| `mac`          | Required. The MAC address of your Magic Blue bulb                                                     |
+| `handle`       | Optional. BLE handle for commands. Use 46 for newer bulbs, defaults to 12 (0x000c) for older versions |
+| `manufacturer` | Optional. Manufacturer name, defaults to "Light"                                                      |
+| `model`        | Optional. Model name, defaults to "Magic Blue"                                                        |
+| `serial`       | Optional. Serial number, defaults to "5D4989E80E44"                                                   |
+
+## Migration from v1.x
+
+If you're upgrading from v1.x, you'll need to update your configuration from an accessory-based setup to a platform-based setup:
+
+### Old Configuration (v1.x)
 
 ```json
 {
@@ -20,24 +74,39 @@ Add this to your homebridge `config.json`:
         {
             "accessory": "magic-blue-bulb",
             "name": "Magic Blue Bulb",
-            "mac": "FB:00:E0:82:AA:1F",
-            "handle": 46
+            "mac": "FB:00:E0:82:AA:1F"
         }
     ]
 }
 ```
 
-### Configuration Options
+### New Configuration (v2.x)
 
-| Key            | Description                                                                                           |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `accessory`    | Required. Must be "magic-blue-bulb"                                                                   |
-| `name`         | Required. The name of this accessory in your HomeKit app                                              |
-| `mac`          | Required. The MAC address of your Magic Blue bulb                                                     |
-| `handle`       | Optional. BLE handle for commands. Use 46 for newer bulbs, defaults to 0x000c (12) for older versions |
-| `manufacturer` | Optional. Manufacturer name, defaults to "Light"                                                      |
-| `model`        | Optional. Model name, defaults to "Magic Blue"                                                        |
-| `serial`       | Optional. Serial number, defaults to "5D4989E80E44"                                                   |
+```json
+{
+    "platforms": [
+        {
+            "name": "Magic Blue Bulbs",
+            "platform": "MagicBlueBulbPlatform",
+            "bulbs": [
+                {
+                    "name": "Magic Blue Bulb",
+                    "mac": "FB:00:E0:82:AA:1F"
+                }
+            ]
+        }
+    ]
+}
+```
+
+## Benefits of Platform Plugin
+
+The new platform plugin architecture provides several advantages:
+
+-   **Multiple Bulbs**: Easily manage multiple Magic Blue bulbs from a single platform configuration
+-   **Better Performance**: Improved caching and accessory management
+-   **Future-Proof**: Uses Homebridge's recommended modern architecture
+-   **Easier Management**: Centralized configuration for all your Magic Blue devices
 
 ## Finding Your Bulb's MAC Address
 
