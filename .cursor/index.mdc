@@ -54,6 +54,14 @@ alwaysApply: true
 - Variables/functions: camelCase
 - Types/interfaces: PascalCase
 
+### Code Documentation Standards
+- **AVOID needless comments** - code should be self-documenting through clear naming
+- Only add comments that explain WHY, not WHAT the code does
+- Use JSDoc comments for public APIs and complex algorithms
+- Document Magic Blue protocol specifics and BLE command formats
+- Explain color conversion logic and HomeKit characteristic mappings
+- Do NOT add obvious comments like `// Set the hue value` for `this.hue = value`
+
 ### Error Handling
 - Use proper BLE connection error handling
 - Implement graceful degradation for Bluetooth connection failures
