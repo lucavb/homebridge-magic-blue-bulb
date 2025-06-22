@@ -98,7 +98,7 @@ export function rgbToHsl(r: number, g: number, b: number): [number, number, numb
     const l = (max + min) / 2;
 
     if (max === min) {
-        h = s = 0; // achromatic
+        h = s = 0;
     } else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -118,8 +118,8 @@ export function rgbToHsl(r: number, g: number, b: number): [number, number, numb
         h /= 6;
     }
 
-    h *= 360; // return degrees [0..360]
-    s *= 100; // return percent [0..100]
-    const lightness = l * 100; // return percent [0..100]
+    h *= 360;
+    s *= 100;
+    const lightness = l * 100;
     return [parseInt(h.toString()), parseInt(s.toString()), parseInt(lightness.toString())];
 }

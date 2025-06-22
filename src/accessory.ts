@@ -5,7 +5,6 @@ import { hslToRgb, rgbToHsl, RgbColor } from './rgbConversion';
 import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
 import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
 
-// Forward declaration to avoid circular import
 interface MagicBlueBulbPlatform {
     readonly log: {
         info(message: string, ...parameters: unknown[]): void;
@@ -24,14 +23,13 @@ interface MagicBlueBulbPlatform {
  * It handles all the BLE communication and HomeKit characteristic management for one bulb.
  */
 export class MagicBlueBulbAccessory {
-    private service!: Service; // Initialized in setupLightbulbService
+    private service!: Service;
     private ledsStatus: LedsStatus;
     private readonly mac: string;
     private readonly handle: number;
     private peripheral?: Peripheral;
 
     constructor(private readonly platform: MagicBlueBulbPlatform, private readonly accessory: PlatformAccessory) {
-        // Validate bulb configuration from context
         let bulb: BulbConfig;
         try {
             bulb = validateBulbConfig(this.accessory.context.bulb);
@@ -71,33 +69,27 @@ export class MagicBlueBulbAccessory {
      * Set up lightbulb service and characteristic handlers
      */
     private setupLightbulbService(bulb: BulbConfig): void {
-        // Get the Lightbulb service if it exists, otherwise create a new Lightbulb service
         this.service =
             this.accessory.getService(this.platform.Service.Lightbulb) ||
             this.accessory.addService(this.platform.Service.Lightbulb);
 
-        // Set the service name, this is what is displayed as the default name on the Home app
         this.service.setCharacteristic(this.platform.Characteristic.Name, bulb.name);
 
-        // Register handlers for the On/Off Characteristic
         this.service
             .getCharacteristic(this.platform.Characteristic.On)
             .onSet(this.setOn.bind(this))
             .onGet(this.getOn.bind(this));
 
-        // Register handlers for the Hue Characteristic
         this.service
             .getCharacteristic(this.platform.Characteristic.Hue)
             .onSet(this.setHue.bind(this))
             .onGet(this.getHue.bind(this));
 
-        // Register handlers for the Saturation Characteristic
         this.service
             .getCharacteristic(this.platform.Characteristic.Saturation)
             .onSet(this.setSaturation.bind(this))
             .onGet(this.getSaturation.bind(this));
 
-        // Register handlers for the Brightness Characteristic
         this.service
             .getCharacteristic(this.platform.Characteristic.Brightness)
             .onSet(this.setBrightness.bind(this))
