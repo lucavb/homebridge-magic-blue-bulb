@@ -1,20 +1,20 @@
 {
     "compilerOptions": {
-        "target": "ES2018",
-        "lib": ["ES2018"],
-        "module": "commonjs",
-        "outDir": "./dist",
-        "rootDir": "./src",
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true,
+        "allowSyntheticDefaultImports": true,
         "declaration": true,
         "declarationMap": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": ["ES2018"],
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "outDir": "./dist",
+        "skipLibCheck": true,
         "sourceMap": true,
-        "moduleResolution": "node"
+        "strict": true,
+        "target": "ES2018"
     },
     "include": ["src/**/*"],
     "typeRoots": ["node_modules/@types", "src/types"],
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["node_modules", "dist", "rollup.config.ts"]
 }
