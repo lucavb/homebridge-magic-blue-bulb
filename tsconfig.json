@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ES2018",
+        "lib": ["ES2018"],
+        "module": "commonjs",
+        "outDir": "./dist",
+        "rootDir": "./src",
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "declaration": true,
+        "declarationMap": true,
+        "sourceMap": true,
+        "moduleResolution": "node"
+    },
+    "include": ["src/**/*"],
+    "typeRoots": ["node_modules/@types", "src/types"],
+    "exclude": ["node_modules", "dist"]
+}
