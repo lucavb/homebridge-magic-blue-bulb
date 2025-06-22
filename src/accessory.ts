@@ -137,7 +137,11 @@ export class MagicBlueBulbAccessory {
             return;
         }
 
-        const rgb: RgbColor = hslToRgb(this.ledsStatus.values[0], this.ledsStatus.values[1], this.ledsStatus.values[2]);
+        const rgb: RgbColor = hslToRgb(
+            this.ledsStatus.values.hue,
+            this.ledsStatus.values.saturation,
+            this.ledsStatus.values.lightness,
+        );
 
         const colorCommand = Buffer.from([
             ...BLE_COMMANDS.COLOR_COMMAND_PREFIX,
@@ -214,7 +218,7 @@ export class MagicBlueBulbAccessory {
         if (typeof value !== 'number') {
             return;
         }
-        this.ledsStatus.values[0] = value;
+        this.ledsStatus.values.hue = value;
         this.log.debug('Set Characteristic Hue ->', value);
 
         if (this.ledsStatus.on) {
@@ -223,7 +227,7 @@ export class MagicBlueBulbAccessory {
     }
 
     async getHue(): Promise<CharacteristicValue> {
-        const hue = this.ledsStatus.values[0];
+        const hue = this.ledsStatus.values.hue;
         this.log.debug('Get Characteristic Hue ->', hue);
         return hue;
     }
@@ -232,7 +236,7 @@ export class MagicBlueBulbAccessory {
         if (typeof value !== 'number') {
             return;
         }
-        this.ledsStatus.values[1] = value;
+        this.ledsStatus.values.saturation = value;
         this.log.debug('Set Characteristic Saturation ->', value);
 
         if (this.ledsStatus.on) {
@@ -241,7 +245,7 @@ export class MagicBlueBulbAccessory {
     }
 
     async getSaturation(): Promise<CharacteristicValue> {
-        const saturation = this.ledsStatus.values[1];
+        const saturation = this.ledsStatus.values.saturation;
         this.log.debug('Get Characteristic Saturation ->', saturation);
         return saturation;
     }
@@ -250,7 +254,7 @@ export class MagicBlueBulbAccessory {
         if (typeof value !== 'number') {
             return;
         }
-        this.ledsStatus.values[2] = value;
+        this.ledsStatus.values.lightness = value;
         this.log.debug('Set Characteristic Brightness ->', value);
 
         if (this.ledsStatus.on) {
@@ -259,7 +263,7 @@ export class MagicBlueBulbAccessory {
     }
 
     async getBrightness(): Promise<CharacteristicValue> {
-        const brightness = this.ledsStatus.values[2];
+        const brightness = this.ledsStatus.values.lightness;
         this.log.debug('Get Characteristic Brightness ->', brightness);
         return brightness;
     }

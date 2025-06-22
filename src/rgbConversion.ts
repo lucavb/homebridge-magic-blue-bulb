@@ -76,6 +76,12 @@ export function hslToRgb(h: number, s: number, v: number): RgbColor {
     return rgb;
 }
 
+export interface HslColor {
+    hue: number;
+    saturation: number;
+    lightness: number;
+}
+
 /**
  * Converts an RGB color value to HSL. Conversion formula
  * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
@@ -85,9 +91,9 @@ export function hslToRgb(h: number, s: number, v: number): RgbColor {
  * @param   {number}  r       The red color value
  * @param   {number}  g       The green color value
  * @param   {number}  b       The blue color value
- * @return  {number[]}        The HSL representation
+ * @return  {HslColor}        The HSL representation
  */
-export function rgbToHsl(r: number, g: number, b: number): [number, number, number] {
+export function rgbToHsl(r: number, g: number, b: number): HslColor {
     r /= 255;
     g /= 255;
     b /= 255;
@@ -121,5 +127,9 @@ export function rgbToHsl(r: number, g: number, b: number): [number, number, numb
     h *= 360;
     s *= 100;
     const lightness = l * 100;
-    return [parseInt(h.toString()), parseInt(s.toString()), parseInt(lightness.toString())];
+    return {
+        hue: parseInt(h.toString()),
+        saturation: parseInt(s.toString()),
+        lightness: parseInt(lightness.toString()),
+    };
 }

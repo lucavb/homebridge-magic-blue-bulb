@@ -2,7 +2,13 @@ import { z } from 'zod';
 
 export const ledsStatusSchema = z.object({
     on: z.boolean(),
-    values: z.tuple([z.number(), z.number(), z.number()]).describe('HSL values: [hue, saturation, lightness]'),
+    values: z
+        .object({
+            hue: z.number(),
+            saturation: z.number(),
+            lightness: z.number(),
+        })
+        .describe('HSL values'),
 });
 
 export type LedsStatus = z.infer<typeof ledsStatusSchema>;
