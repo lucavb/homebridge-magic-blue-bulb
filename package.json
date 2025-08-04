@@ -65,7 +65,7 @@
         "watch": "rollup -c rollup.config.ts --configPlugin typescript --watch"
     },
     "dependencies": {
-        "@stoprocent/noble": "2.3.2",
+        "@stoprocent/noble": "2.3.4",
         "zod": "3.25.67"
     },
     "devDependencies": {
