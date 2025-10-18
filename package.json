@@ -81,7 +81,7 @@
         "@types/node": "22.18.10",
         "eslint": "9.36.0",
         "homebridge": "1.11.0",
-        "jiti": "2.6.0",
+        "jiti": "2.6.1",
         "prettier": "3.5.3",
         "rollup": "4.52.2",
         "rollup-plugin-dts": "6.2.3",
