@@ -82,7 +82,7 @@
         "eslint": "9.39.2",
         "homebridge": "1.11.2",
         "jiti": "2.6.1",
-        "prettier": "3.5.3",
+        "prettier": "3.8.1",
         "rollup": "4.57.1",
         "rollup-plugin-dts": "6.3.0",
         "semantic-release": "24.2.9",
