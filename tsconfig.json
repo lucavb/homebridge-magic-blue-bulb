@@ -9,13 +9,12 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         "outDir": "./dist",
-        "rootDir": "src",
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
         "target": "ES2022"
     },
-    "include": ["src/**/*"],
+    "include": ["src/**/*", "test/**/*", "vitest.config.ts"],
     "typeRoots": ["node_modules/@types", "src/types"],
-    "exclude": ["node_modules", "dist", "tsdown.config.ts"]
+    "exclude": ["node_modules", "dist", "tsdown.config.ts", "test/exports.spec.ts"]
 }

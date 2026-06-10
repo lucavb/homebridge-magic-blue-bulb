@@ -42,4 +42,5 @@ dist/
 .env
 
 .tmp/
+tmp/
 .idea

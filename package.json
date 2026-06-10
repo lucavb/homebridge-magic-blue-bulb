@@ -61,7 +61,8 @@
         "prepublishOnly": "npm run build",
         "release": "semantic-release",
         "release:dry": "semantic-release --dry-run",
-        "test": "node -e \"import('./dist/index.mjs').then(m => { if (typeof m.default !== 'function') throw new Error('ESM default export missing'); console.log('ESM ok'); })\" && node -e \"const m = require('./dist/index.cjs'); if (typeof m !== 'function') throw new Error('CJS default export missing'); console.log('CJS ok');\"",
+        "test": "npm run build && vitest run",
+        "test:watch": "vitest",
         "watch": "tsdown --watch"
     },
     "dependencies": {
@@ -87,7 +88,8 @@
         "semantic-release": "25.0.5",
         "tsdown": "0.22.2",
         "typescript": "6.0.3",
-        "typescript-eslint": "8.61.0"
+        "typescript-eslint": "8.61.0",
+        "vitest": "4.1.8"
     },
     "engines": {
         "homebridge": "^1.8.0 || ^2.0.0",

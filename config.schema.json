@@ -4,7 +4,7 @@
     "singular": false,
     "strictValidation": true,
     "headerDisplay": "Configure your MagicBlue LED Bulbs via Bluetooth Low Energy (BLE). Make sure your Homebridge system has Bluetooth capabilities and the bulbs are within range.",
-    "footerDisplay": "For help and examples, please see the [plugin documentation](https://github.com/lucavb/homebridge-magic-blue-bulb#readme).",
+    "footerDisplay": "For help and examples, please see the [plugin documentation](https://github.com/lucavb/homebridge-magic-blue-bulb#readme). Warm white and state sync features are beta — please report results in GitHub issues.",
     "schema": {
         "type": "object",
         "properties": {
@@ -42,11 +42,38 @@
                             "description": "The Bluetooth MAC address of the bulb (format: AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF)"
                         },
                         "handle": {
-                            "title": "BLE Handle (Optional)",
+                            "title": "BLE Write Handle (Optional)",
                             "type": "integer",
                             "minimum": 1,
-                            "placeholder": 43,
-                            "description": "Optional: BLE characteristic handle if non-standard (usually auto-detected)"
+                            "default": 12,
+                            "placeholder": 12,
+                            "description": "GATT write handle for commands (default 12 / 0x000c). Some newer bulbs may need a different value — check plugin docs."
+                        },
+                        "readHandle": {
+                            "title": "BLE Read Handle (Optional)",
+                            "type": "integer",
+                            "minimum": 1,
+                            "default": 15,
+                            "placeholder": 15,
+                            "description": "GATT read handle for status responses (default 15 / 0x000f)"
+                        },
+                        "version": {
+                            "title": "Bulb Version (Optional)",
+                            "type": "integer",
+                            "enum": [6, 7, 8, 9, 10],
+                            "description": "Firmware version shown in the official app. Used to pick the BLE address type if addressType is not set (v7/v8 = random, v6/v9/v10 = public)."
+                        },
+                        "addressType": {
+                            "title": "BLE Address Type (Optional)",
+                            "type": "string",
+                            "enum": ["public", "random"],
+                            "description": "Override BLE address type for connection. Leave unset to derive from version or MAC."
+                        },
+                        "debug": {
+                            "title": "Debug BLE Traffic",
+                            "type": "boolean",
+                            "default": false,
+                            "description": "Log raw BLE writes and reads to the Homebridge log (useful for issue reports)"
                         },
                         "manufacturer": {
                             "title": "Manufacturer (Optional)",
@@ -116,6 +143,22 @@
                                         {
                                             "key": "bulbs[].handle",
                                             "type": "number"
+                                        },
+                                        {
+                                            "key": "bulbs[].readHandle",
+                                            "type": "number"
+                                        },
+                                        {
+                                            "key": "bulbs[].version",
+                                            "type": "number"
+                                        },
+                                        {
+                                            "key": "bulbs[].addressType",
+                                            "type": "select"
+                                        },
+                                        {
+                                            "key": "bulbs[].debug",
+                                            "type": "checkbox"
                                         },
                                         {
                                             "key": "bulbs[].manufacturer",

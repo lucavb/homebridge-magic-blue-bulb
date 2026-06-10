@@ -1,22 +1,44 @@
-import { Service, PlatformAccessory, CharacteristicValue, Characteristic, Logger } from 'homebridge';
+import { API, Service, PlatformAccessory, CharacteristicValue, Characteristic, Logger } from 'homebridge';
 import noble, { Peripheral } from '@stoprocent/noble';
-import { hslToRgb, rgbToHsl } from './rgbConversion';
+import { hslToRgb, rgbToHsl } from './rgb-conversion';
 import { BulbConfig, LedsStatus, validateBulbConfig } from './types';
-import { DEFAULT_HANDLE, BLE_COMMANDS, DEFAULT_ACCESSORY_INFO } from './constants';
+import { DEFAULT_HANDLE, DEFAULT_READ_HANDLE, DEFAULT_ACCESSORY_INFO, STATUS_POLL_INTERVAL_MS } from './constants';
+import {
+    buildPowerOnCommand,
+    buildPowerOffCommand,
+    buildRgbCommand,
+    buildWarmWhiteCommand,
+    resolveAddressType,
+    ParsedDeviceStatus,
+} from './protocol';
+import { readDeviceStatus, writeBleCommand, BleHandles } from './ble-transport';
+import {
+    MIRED_MAX,
+    MIRED_MIN,
+    brightnessAndMiredsToWarmWhiteIntensity,
+    isWarmWhiteMireds,
+    warmWhiteIntensityToMireds,
+} from './color-temperature';
 
 export class MagicBlueBulbAccessory {
     private readonly service: Service;
     private readonly ledsStatus: LedsStatus;
     private readonly mac: string;
-    private readonly handle: number;
+    private readonly handles: BleHandles;
+    private readonly debug: boolean;
+    private readonly addressType: 'public' | 'random';
 
     private peripheral?: Peripheral;
+    private discoverHandler?: (peripheral: Peripheral) => void;
+    private statusPollTimer?: ReturnType<typeof setInterval>;
+    private isApplyingState = false;
 
     constructor(
         private readonly log: Logger,
         private readonly homebridgeService: typeof Service,
         private readonly homebridgeCharacteristic: typeof Characteristic,
         private readonly accessory: PlatformAccessory,
+        api: API,
     ) {
         let bulb: BulbConfig;
         try {
@@ -29,15 +51,26 @@ export class MagicBlueBulbAccessory {
 
         this.ledsStatus = {
             on: true,
+            mode: 'rgb',
             values: rgbToHsl(255, 255, 255),
+            colorTemperature: MIRED_MAX,
         };
         this.mac = bulb.mac.toLowerCase();
-        this.handle = bulb.handle || DEFAULT_HANDLE;
+        this.handles = {
+            writeHandle: bulb.handle ?? DEFAULT_HANDLE,
+            readHandle: bulb.readHandle ?? DEFAULT_READ_HANDLE,
+        };
+        this.debug = bulb.debug ?? false;
+        this.addressType = resolveAddressType(bulb.version, bulb.addressType, this.mac);
 
         this.setupAccessoryInformation(bulb);
         this.service = this.setupLightbulbService(bulb);
 
-        this.findBulb(this.mac).catch((error) => {
+        api.on('shutdown', () => {
+            this.cleanup();
+        });
+
+        this.findBulb().catch((error) => {
             this.log.error(`Failed to initialize BLE discovery for ${bulb.name}:`, error);
         });
     }
@@ -81,33 +114,190 @@ export class MagicBlueBulbAccessory {
             .getCharacteristic(this.homebridgeCharacteristic.Brightness)
             .onSet(this.setBrightness)
             .onGet(this.getBrightness);
+
+        const colorTemp = service.getCharacteristic(this.homebridgeCharacteristic.ColorTemperature);
+        colorTemp.setProps({ minValue: MIRED_MIN, maxValue: MIRED_MAX });
+        colorTemp.onSet(this.setColorTemperature).onGet(this.getColorTemperature);
+
         return service;
     }
 
-    private async findBulb(mac: string, callback?: () => void): Promise<void> {
+    private async findBulb(): Promise<void> {
         try {
             await noble.waitForPoweredOnAsync();
-
             await noble.startScanningAsync();
 
-            noble.on('discover', (peripheral: Peripheral) => {
-                if (peripheral.id === mac || peripheral.address === mac) {
-                    this.log.info('Found Magic Blue bulb:', mac);
+            this.discoverHandler = (peripheral: Peripheral) => {
+                if (peripheral.id === this.mac || peripheral.address.toLowerCase() === this.mac) {
+                    this.log.info('Found Magic Blue bulb:', this.mac);
                     this.peripheral = peripheral;
-                    noble.stopScanningAsync();
-                    if (callback) {
-                        callback();
+                    if (this.discoverHandler) {
+                        noble.removeListener('discover', this.discoverHandler);
+                        this.discoverHandler = undefined;
                     }
+                    void noble.stopScanningAsync();
+                    this.onPeripheralFound();
                 }
-            });
+            };
+
+            noble.on('discover', this.discoverHandler);
         } catch (error) {
             this.log.error('Error during BLE discovery:', error);
         }
     }
 
-    private async writeColor(): Promise<void> {
+    private onPeripheralFound(): void {
+        if (!this.peripheral) {
+            return;
+        }
+
+        this.peripheral.on('disconnect', () => {
+            this.log.warn('Bulb disconnected');
+            this.stopStatusPolling();
+        });
+
+        void this.attemptConnect().then((connected) => {
+            if (connected) {
+                void this.syncFromBulb();
+                this.startStatusPolling();
+            }
+        });
+    }
+
+    private startStatusPolling(): void {
+        this.stopStatusPolling();
+        this.statusPollTimer = setInterval(() => {
+            void this.syncFromBulb();
+        }, STATUS_POLL_INTERVAL_MS);
+    }
+
+    private stopStatusPolling(): void {
+        if (this.statusPollTimer) {
+            clearInterval(this.statusPollTimer);
+            this.statusPollTimer = undefined;
+        }
+    }
+
+    private cleanup(): void {
+        this.stopStatusPolling();
+        if (this.discoverHandler) {
+            noble.removeListener('discover', this.discoverHandler);
+            this.discoverHandler = undefined;
+        }
+        void noble.stopScanningAsync().catch(() => undefined);
+        if (this.peripheral?.state === 'connected') {
+            void this.peripheral.disconnectAsync().catch(() => undefined);
+        }
+    }
+
+    private async attemptConnect(): Promise<boolean> {
+        if (!this.peripheral) {
+            this.log.warn('Bulb not found or not ready for connection');
+            return false;
+        }
+
+        if (this.peripheral.state === 'connected') {
+            return true;
+        }
+
+        if (this.peripheral.state === 'disconnected') {
+            this.log.info('Connecting to bulb...');
+            try {
+                this.peripheral = await noble.connectAsync(this.peripheral.id, {
+                    addressType: this.addressType,
+                });
+                this.log.info('Connection successful');
+                return true;
+            } catch (error) {
+                this.log.error('Connection failed:', error);
+                return false;
+            }
+        }
+
+        this.log.warn(`Bulb in unexpected state: ${this.peripheral.state}`);
+        return false;
+    }
+
+    private async syncFromBulb(): Promise<void> {
+        if (this.isApplyingState) {
+            return;
+        }
+
         const connected = await this.attemptConnect();
-        if (!connected) {
+        if (!connected || !this.peripheral) {
+            return;
+        }
+
+        try {
+            const status = await readDeviceStatus(this.peripheral, this.handles, this.log, this.debug);
+            if (status) {
+                this.applyStatusFromBulb(status);
+            }
+        } catch (error) {
+            this.log.debug('Status read failed:', error);
+        }
+    }
+
+    private applyStatusFromBulb(status: ParsedDeviceStatus): void {
+        this.isApplyingState = true;
+        try {
+            this.ledsStatus.on = status.on;
+
+            if (status.mode === 'warmWhite') {
+                this.ledsStatus.mode = 'warmWhite';
+                const brightness = Math.round((status.warmWhiteIntensity / 255) * 100);
+                this.ledsStatus.values.lightness = brightness;
+                this.ledsStatus.colorTemperature = warmWhiteIntensityToMireds(status.warmWhiteIntensity, brightness);
+            } else {
+                this.ledsStatus.mode = 'rgb';
+                const hsl = rgbToHsl(status.red, status.green, status.blue);
+                this.ledsStatus.values = hsl;
+                const maxChannel = Math.max(status.red, status.green, status.blue);
+                this.ledsStatus.values.lightness = Math.round((maxChannel / 255) * 100);
+            }
+
+            this.updateHomeKitCharacteristics();
+        } finally {
+            this.isApplyingState = false;
+        }
+    }
+
+    private updateHomeKitCharacteristics(): void {
+        this.service.updateCharacteristic(this.homebridgeCharacteristic.On, this.ledsStatus.on);
+        this.service.updateCharacteristic(this.homebridgeCharacteristic.Brightness, this.ledsStatus.values.lightness);
+        this.service.updateCharacteristic(this.homebridgeCharacteristic.Hue, this.ledsStatus.values.hue);
+        this.service.updateCharacteristic(this.homebridgeCharacteristic.Saturation, this.ledsStatus.values.saturation);
+        this.service.updateCharacteristic(
+            this.homebridgeCharacteristic.ColorTemperature,
+            this.ledsStatus.colorTemperature,
+        );
+    }
+
+    private async applyLightState(): Promise<void> {
+        const connected = await this.attemptConnect();
+        if (!connected || !this.peripheral) {
+            return;
+        }
+
+        if (!this.ledsStatus.on) {
+            await writeBleCommand(this.peripheral, this.handles, buildPowerOffCommand(), this.log, this.debug);
+            return;
+        }
+
+        await writeBleCommand(this.peripheral, this.handles, buildPowerOnCommand(), this.log, this.debug);
+
+        if (this.ledsStatus.mode === 'warmWhite') {
+            const intensity = brightnessAndMiredsToWarmWhiteIntensity(
+                this.ledsStatus.values.lightness,
+                this.ledsStatus.colorTemperature,
+            );
+            await writeBleCommand(
+                this.peripheral,
+                this.handles,
+                buildWarmWhiteCommand(intensity),
+                this.log,
+                this.debug,
+            );
             return;
         }
 
@@ -116,70 +306,28 @@ export class MagicBlueBulbAccessory {
             this.ledsStatus.values.saturation,
             this.ledsStatus.values.lightness,
         );
-
-        const colorCommand = Buffer.from([
-            ...BLE_COMMANDS.COLOR_COMMAND_PREFIX,
-            rgb.r,
-            rgb.g,
-            rgb.b,
-            ...BLE_COMMANDS.COLOR_COMMAND_SUFFIX,
-        ]);
-
-        if (!this.peripheral) {
-            this.log.error('No peripheral available for color write');
-            return;
-        }
-
-        try {
-            await this.peripheral.writeHandleAsync(this.handle, colorCommand, true);
-        } catch (error) {
-            this.log.error('BLE: Write handle Error:', error);
-        }
-    }
-
-    private async attemptConnect(): Promise<boolean> {
-        if (this.peripheral && this.peripheral.state === 'connected') {
-            return true;
-        } else if (this.peripheral && this.peripheral.state === 'disconnected') {
-            this.log.info('Lost connection to bulb. Attempting reconnect...');
-            try {
-                await this.peripheral.connectAsync();
-                this.log.info('Reconnect was successful');
-                return true;
-            } catch (error) {
-                this.log.error('Reconnect was unsuccessful:', error);
-                return false;
-            }
-        } else {
-            this.log.warn('Bulb not found or not ready for connection');
-            return false;
-        }
+        await writeBleCommand(
+            this.peripheral,
+            this.handles,
+            buildRgbCommand(rgb.r, rgb.g, rgb.b),
+            this.log,
+            this.debug,
+        );
     }
 
     private setOn = async (value: CharacteristicValue): Promise<void> => {
         if (typeof value !== 'boolean') {
             return;
         }
-        const code = value ? BLE_COMMANDS.TURN_ON : BLE_COMMANDS.TURN_OFF;
 
-        const connected = await this.attemptConnect();
-        if (!connected || !this.peripheral) {
-            throw new Error('Could not connect to peripheral');
-        }
-
-        const powerCommand = Buffer.from([
-            ...BLE_COMMANDS.POWER_COMMAND_PREFIX,
-            code,
-            ...BLE_COMMANDS.POWER_COMMAND_SUFFIX,
-        ]);
+        this.ledsStatus.on = value;
+        this.log.debug('Set Characteristic On ->', value);
 
         try {
-            await this.peripheral.writeHandleAsync(this.handle, powerCommand, true);
-            this.ledsStatus.on = value;
-            this.log.debug('Set Characteristic On ->', value);
+            await this.applyLightState();
         } catch (error) {
-            this.log.error('BLE: Write handle Error:', error);
-            throw new Error(error instanceof Error ? error.message : String(error), { cause: error });
+            this.log.error('Failed to set power state:', error);
+            throw error instanceof Error ? error : new Error(String(error));
         }
     };
 
@@ -192,11 +340,12 @@ export class MagicBlueBulbAccessory {
         if (typeof value !== 'number') {
             return;
         }
+        this.ledsStatus.mode = 'rgb';
         this.ledsStatus.values.hue = value;
         this.log.debug('Set Characteristic Hue ->', value);
 
         if (this.ledsStatus.on) {
-            await this.writeColor();
+            await this.applyLightState();
         }
     };
 
@@ -210,11 +359,12 @@ export class MagicBlueBulbAccessory {
         if (typeof value !== 'number') {
             return;
         }
+        this.ledsStatus.mode = 'rgb';
         this.ledsStatus.values.saturation = value;
         this.log.debug('Set Characteristic Saturation ->', value);
 
         if (this.ledsStatus.on) {
-            await this.writeColor();
+            await this.applyLightState();
         }
     };
 
@@ -232,7 +382,7 @@ export class MagicBlueBulbAccessory {
         this.log.debug('Set Characteristic Brightness ->', value);
 
         if (this.ledsStatus.on) {
-            await this.writeColor();
+            await this.applyLightState();
         }
     };
 
@@ -240,5 +390,28 @@ export class MagicBlueBulbAccessory {
         const brightness = this.ledsStatus.values.lightness;
         this.log.debug('Get Characteristic Brightness ->', brightness);
         return brightness;
+    };
+
+    private setColorTemperature = async (value: CharacteristicValue): Promise<void> => {
+        if (typeof value !== 'number') {
+            return;
+        }
+        this.ledsStatus.colorTemperature = value;
+        this.ledsStatus.mode = isWarmWhiteMireds(value) ? 'warmWhite' : 'rgb';
+        if (this.ledsStatus.mode === 'rgb') {
+            this.ledsStatus.values.hue = 0;
+            this.ledsStatus.values.saturation = 0;
+        }
+        this.log.debug('Set Characteristic ColorTemperature ->', value);
+
+        if (this.ledsStatus.on) {
+            await this.applyLightState();
+        }
+    };
+
+    private getColorTemperature = async (): Promise<CharacteristicValue> => {
+        const colorTemperature = this.ledsStatus.colorTemperature;
+        this.log.debug('Get Characteristic ColorTemperature ->', colorTemperature);
+        return colorTemperature;
     };
 }

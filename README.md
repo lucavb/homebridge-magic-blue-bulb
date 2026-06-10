@@ -4,11 +4,23 @@ This plugin enables you to control your MagicBlue LED light bulbs through HomeKi
 
 ## Installation
 
+### Stable (`main` branch → npm `latest`)
+
 ```bash
 npm install -g homebridge-magic-blue-bulb
 ```
 
-You may need to use `sudo` with that command.
+### Beta (`beta` branch → npm `beta`)
+
+Warm white, color temperature, and state sync ship from the **`beta`** branch only. They are not fully hardware-validated:
+
+```bash
+npm install -g homebridge-magic-blue-bulb@beta
+```
+
+You may need to use `sudo` with either command.
+
+When beta is validated, merge `beta` → `main`. The next push to `main` publishes a stable release on `latest`.
 
 ## Configuration
 
@@ -70,14 +82,39 @@ If you provide an invalid configuration, you'll see helpful error messages in th
 
 ### Bulb Configuration Options
 
-| Key            | Description                                                                                           |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `name`         | Required. The name of this bulb in your HomeKit app                                                   |
-| `mac`          | Required. The MAC address of your Magic Blue bulb                                                     |
-| `handle`       | Optional. BLE handle for commands. Use 46 for newer bulbs, defaults to 12 (0x000c) for older versions |
-| `manufacturer` | Optional. Manufacturer name, defaults to "Light"                                                      |
-| `model`        | Optional. Model name, defaults to "Magic Blue"                                                        |
-| `serial`       | Optional. Serial number, defaults to "5D4989E80E44"                                                   |
+| Key            | Description                                                                                          |
+| -------------- | ---------------------------------------------------------------------------------------------------- |
+| `name`         | Required. The name of this bulb in your HomeKit app                                                  |
+| `mac`          | Required. The MAC address of your Magic Blue bulb                                                    |
+| `handle`       | Optional. BLE write handle for commands (default `12` / `0x000c`)                                    |
+| `readHandle`   | Optional. BLE read handle for status (default `15` / `0x000f`)                                       |
+| `version`      | Optional. Bulb firmware version from the official app (`6`–`10`); selects BLE address type if needed |
+| `addressType`  | Optional. `"public"` or `"random"` BLE address type override                                         |
+| `debug`        | Optional. Log raw BLE traffic to help troubleshoot connection issues                                 |
+| `manufacturer` | Optional. Manufacturer name, defaults to "Light"                                                     |
+| `model`        | Optional. Model name, defaults to "Magic Blue"                                                       |
+| `serial`       | Optional. Serial number, defaults to "5D4989E80E44"                                                  |
+
+## HomeKit features (beta)
+
+This plugin exposes a standard HomeKit **Lightbulb** with:
+
+- **On** — power on/off (restores last color or warm-white when turning on)
+- **Brightness**, **Hue**, **Saturation** — RGB color control
+- **Color Temperature** — warm white via the bulb's dedicated WW channel
+
+State is polled from the bulb after connect so HomeKit stays closer in sync when the bulb is changed elsewhere.
+
+> **Beta notice:** Warm white, color temperature mapping, and state readback are ported from the community [Betree/magicblue](https://github.com/Betree/magicblue) protocol reference and are **not fully hardware-validated** by the maintainer. If something misbehaves, open an issue with your bulb `version`, `handle`, OS, and set `"debug": true` to capture BLE logs.
+
+### Validation checklist (please report back)
+
+1. Does on/off work reliably after reconnect?
+2. Does RGB color match what you set in the Home app?
+3. Does the color temperature slider produce visible warm white (not just dim RGB white)?
+4. If you change the bulb with the official app, does HomeKit update within ~30 seconds?
+
+Magic Blue **effects** and **schedules** are not supported — use the official app or HomeKit automations instead.
 
 ## Migration from v1.x
 
@@ -190,8 +227,12 @@ homebridge-magic-blue-bulb/
 │   ├── platform.ts           # Main platform class
 │   ├── accessory.ts          # Individual bulb accessory implementation
 │   ├── constants.ts          # BLE commands and default values
-│   ├── rgbConversion.ts      # HSL/RGB color conversion utilities
+│   ├── protocol.ts           # BLE command builders and status parser
+│   ├── ble-transport.ts      # Noble read/write helpers
+│   ├── color-temperature.ts  # HomeKit mireds ↔ warm-white mapping
+│   ├── rgb-conversion.ts     # HSL/RGB color conversion utilities
 │   └── types.ts              # TypeScript type definitions and validation
+├── test/                     # Vitest specs (*.spec.ts)
 ├── dist/                     # Compiled JavaScript output
 ├── tsconfig.json            # TypeScript configuration
 └── package.json             # Dependencies and scripts

@@ -8,6 +8,8 @@
                     "name": "Living Room Light",
                     "mac": "aa:bb:cc:dd:ee:ff",
                     "handle": 12,
+                    "readHandle": 15,
+                    "version": 9,
                     "manufacturer": "Magic Blue",
                     "model": "RGB Bulb",
                     "serial": "MB001"
@@ -16,6 +18,9 @@
                     "name": "Bedroom Light",
                     "mac": "ff:ee:dd:cc:bb:aa",
                     "handle": 12,
+                    "readHandle": 15,
+                    "version": 7,
+                    "addressType": "random",
                     "manufacturer": "Magic Blue",
                     "model": "RGB Bulb",
                     "serial": "MB002"

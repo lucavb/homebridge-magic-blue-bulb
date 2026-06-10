@@ -1,17 +1,10 @@
 export const PLATFORM_NAME = 'MagicBlueBulbPlatform';
 export const PLUGIN_NAME = 'homebridge-magic-blue-bulb';
 
-export const DEFAULT_HANDLE = 0x000c; // v9 is 0x000b
-export const DEFAULT_HANDLE_V9 = 0x000b;
+export const DEFAULT_HANDLE = 0x000c;
+export const DEFAULT_READ_HANDLE = 0x000f;
 
-export const BLE_COMMANDS = {
-    COLOR_COMMAND_PREFIX: [0x56],
-    COLOR_COMMAND_SUFFIX: [0x00, 0xf0, 0xaa, 0x3b, 0x07, 0x00, 0x01],
-    POWER_COMMAND_PREFIX: [0xcc],
-    POWER_COMMAND_SUFFIX: [0x33],
-    TURN_OFF: 0x24,
-    TURN_ON: 0x23,
-} as const;
+export const STATUS_POLL_INTERVAL_MS = 30_000;
 
 export const DEFAULT_ACCESSORY_INFO = {
     MANUFACTURER: 'Light',
