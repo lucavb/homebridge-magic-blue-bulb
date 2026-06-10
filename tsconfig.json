@@ -5,16 +5,17 @@
         "declarationMap": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
-        "lib": ["ES2018"],
-        "module": "ESNext",
-        "moduleResolution": "node",
+        "lib": ["ES2022"],
+        "module": "NodeNext",
+        "moduleResolution": "NodeNext",
         "outDir": "./dist",
+        "rootDir": "src",
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
-        "target": "ES2018"
+        "target": "ES2022"
     },
     "include": ["src/**/*"],
     "typeRoots": ["node_modules/@types", "src/types"],
-    "exclude": ["node_modules", "dist", "rollup.config.ts"]
+    "exclude": ["node_modules", "dist", "tsdown.config.ts"]
 }

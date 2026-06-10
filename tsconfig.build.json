@@ -1,8 +1,0 @@
-{
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "moduleResolution": "node",
-        "declaration": false,
-        "declarationMap": false
-    }
-}

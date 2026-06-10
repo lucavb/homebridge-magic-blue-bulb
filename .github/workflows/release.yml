@@ -33,9 +33,6 @@ jobs:
             - name: Install dependencies
               run: npm ci
 
-            - name: Install Homebridge
-              run: npm install -g homebridge
-
             - name: Code Quality
               run: npm run cq
 

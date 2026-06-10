@@ -179,7 +179,7 @@ export class MagicBlueBulbAccessory {
             this.log.debug('Set Characteristic On ->', value);
         } catch (error) {
             this.log.error('BLE: Write handle Error:', error);
-            throw new Error(error instanceof Error ? error.message : String(error));
+            throw new Error(error instanceof Error ? error.message : String(error), { cause: error });
         }
     };
 

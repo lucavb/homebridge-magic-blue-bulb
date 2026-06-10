@@ -151,13 +151,15 @@ aa:bb:cc:dd:ee:ff LEDBLE-A582661F    <--- this is your light bulb
 
 ## Development
 
-This project is written in TypeScript. To develop and contribute:
+This project is written in TypeScript and built with [tsdown](https://tsdown.dev/). To develop and contribute:
 
 ### Setup
 
 ```bash
 npm install
 ```
+
+Requires Node.js **22.18+** for building (tsdown) and **22.12+** or **24+** at runtime.
 
 ### Build
 
@@ -171,7 +173,13 @@ npm run build
 npm run watch
 ```
 
-The TypeScript source files are in `src/` and the compiled JavaScript output is in `dist/`.
+Link the plugin into your local Homebridge install:
+
+```bash
+npm link
+```
+
+The TypeScript source files are in `src/` and the compiled output is in `dist/` (`index.mjs`, `index.cjs`, and type declarations).
 
 ### Project Structure
 
@@ -191,20 +199,21 @@ homebridge-magic-blue-bulb/
 
 ## Requirements
 
-- Node.js >= 22.0.0
-- Homebridge >= 1.6.0 (compatible with Homebridge v2.0)
+- Node.js `^22.12.0` or `^24.0.0`
+- Homebridge `^1.8.0` or `^2.0.0`
 - Bluetooth LE support on your system
 
 ## Homebridge v2.0 Compatibility
 
-This plugin is **fully compatible** with Homebridge v2.0! It uses:
+This plugin supports Homebridge v2.0 and remains compatible with Homebridge v1.8+ on Node 22+. It uses:
 
-- ✅ Modern platform plugin architecture
-- ✅ Current HAP-NodeJS APIs (no deprecated patterns)
-- ✅ Proper TypeScript implementation with strict typing
-- ✅ Zod validation for enhanced configuration safety
+- Modern dynamic platform plugin architecture
+- Current HAP-NodeJS APIs (no deprecated patterns)
+- TypeScript with strict typing
+- Zod validation for enhanced configuration safety
+- Dual ESM/CJS build output via tsdown
 
-Users will see a green checkmark in the Homebridge UI once v2.0 is installed.
+Users on Homebridge v2 will see a green checkmark in the UI readiness check once this plugin version is installed.
 
 ## Issues
 

@@ -35,7 +35,7 @@ export type PlatformConfigType = z.infer<typeof platformConfigSchema>;
 export function validateBulbConfig(input: unknown): BulbConfig {
     const result = bulbConfigSchema.safeParse(input);
     if (!result.success) {
-        const errorMessages = result.error.errors.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
+        const errorMessages = result.error.issues.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
         throw new Error(`Invalid bulb configuration: ${errorMessages}`);
     }
     return result.data;
@@ -44,7 +44,7 @@ export function validateBulbConfig(input: unknown): BulbConfig {
 export function validatePlatformConfig(input: unknown): PlatformConfigType {
     const result = platformConfigSchema.safeParse(input);
     if (!result.success) {
-        const errorMessages = result.error.errors.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
+        const errorMessages = result.error.issues.map((err) => `${err.path.join('.')}: ${err.message}`).join(', ');
         throw new Error(`Invalid platform configuration: ${errorMessages}`);
     }
     return result.data;
