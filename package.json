@@ -52,7 +52,7 @@
         "build:dev": "rollup -c rollup.config.ts --configPlugin typescript --watch",
         "build:legacy": "tsc",
         "commitlint": "commitlint --from HEAD~1 --to HEAD --verbose",
-        "cq": "npm run cq:lint && npm run cq:format:check && npm run cq:typecheck",
+        "cq": "npm run cq:typecheck && npm run cq:lint && npm run cq:format:check && npm run build",
         "cq:format": "prettier --write .",
         "cq:format:check": "prettier --check .",
         "cq:lint": "eslint .",
@@ -75,9 +75,9 @@
         "@eslint/js": "9.39.2",
         "@rollup/plugin-typescript": "12.3.0",
         "@semantic-release/commit-analyzer": "13.0.1",
-        "@semantic-release/github": "11.0.6",
-        "@semantic-release/npm": "12.0.2",
-        "@semantic-release/release-notes-generator": "14.1.0",
+        "@semantic-release/github": "12.0.8",
+        "@semantic-release/npm": "13.1.5",
+        "@semantic-release/release-notes-generator": "14.1.1",
         "@types/node": "22.19.11",
         "eslint": "9.39.2",
         "homebridge": "1.11.2",
@@ -85,14 +85,17 @@
         "prettier": "3.5.3",
         "rollup": "4.59.0",
         "rollup-plugin-dts": "6.3.0",
-        "semantic-release": "24.2.9",
+        "semantic-release": "25.0.5",
         "tslib": "2.8.1",
         "typescript": "5.8.3",
         "typescript-eslint": "8.55.0"
     },
     "engines": {
         "homebridge": "^1.6.0 || ^2.0.0-beta.0",
-        "node": "^22.0.0"
+        "node": "^22 || ^24"
+    },
+    "publishConfig": {
+        "access": "public"
     },
     "homebridge": {
         "displayName": "Magic Blue Bulb Platform",
