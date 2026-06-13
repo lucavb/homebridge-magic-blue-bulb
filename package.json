@@ -78,7 +78,7 @@
         "@semantic-release/github": "12.0.8",
         "@semantic-release/npm": "13.1.5",
         "@semantic-release/release-notes-generator": "14.1.1",
-        "@types/node": "25.9.2",
+        "@types/node": "25.9.3",
         "eslint": "10.4.1",
         "homebridge": "2.1.0",
         "jiti": "2.7.0",
