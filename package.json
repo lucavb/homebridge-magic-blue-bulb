@@ -80,7 +80,7 @@
         "@semantic-release/release-notes-generator": "14.1.1",
         "@types/node": "25.9.5",
         "eslint": "10.7.0",
-        "homebridge": "2.1.1",
+        "homebridge": "2.2.0",
         "jiti": "2.7.0",
         "prettier": "3.9.5",
         "publint": "0.3.21",
