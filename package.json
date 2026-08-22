@@ -65,7 +65,7 @@
         "watch": "tsdown --watch"
     },
     "dependencies": {
-        "@stoprocent/noble": "2.7.1",
+        "@stoprocent/noble": "2.8.0",
         "zod": "4.4.3"
     },
     "devDependencies": {
