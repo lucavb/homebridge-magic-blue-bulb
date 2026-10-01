@@ -159,7 +159,7 @@ This project is written in TypeScript and built with [tsdown](https://tsdown.dev
 npm install
 ```
 
-Requires Node.js **22.18+** for building (tsdown) and **22.12+** or **24+** at runtime.
+Requires Node.js **24.21.0** (pinned in `.nvmrc`) for building and **22.12+** or **24+** at runtime.
 
 ### Build
 
