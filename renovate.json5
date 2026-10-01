@@ -42,6 +42,9 @@
         },
         {
             matchDatasources: ['npm'],
+            // keep scoped below major: this rule sits after the major rule,
+            // so matching majors here would override automerge: false.
+            matchUpdateTypes: ['patch', 'minor'],
             vulnerabilityAlerts: {
                 enabled: true,
             },
